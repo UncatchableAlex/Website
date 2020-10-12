@@ -1,0 +1,78 @@
+			html{
+				margin: 0px;
+				height: 100%;
+				width: 100%;
+			}
+			body{
+				background-color: black;
+				top: 0px;
+				left: 0px;
+				min-height: 100%;
+				width: 100%;
+				margin: 0px;
+				overflow: hidden;
+			}
+			h1{
+				text-align: center;
+				font-size: 8em;
+				font-weight: bold;
+				font-style: italic;
+				font-family: "blippo, fantasy";
+				color: lightslategrey;
+			}
+			.border{
+				position: absolute;
+				background: lightskyblue;
+				width: 30%;
+				height: 20%;
+			}
+			.header{
+				position: absolute;
+				width: 100%;
+				height: 10%;
+				top: 0;
+				font-family: "blippo, fantasy";
+				font-size: xx-large;
+
+				text-align: center;
+			}
+			.centered{
+		 		display: flex; 
+		 		justify-content: center;
+		 		align-items: center;
+			}
+			.beingDragged{
+				background: fuchsia;
+				position: absolute;
+				z-index: 100;
+				height: 150px;
+				width: 150px;
+			}
+			.bloop{
+				background: lime;
+				position: absolute;
+				border-radius: 100%;
+				z-index: 0;
+				height: 10px;
+				width: 10px;
+				animation-name: shrink;
+				animation-duration: 2s;
+				animation-timing-function: linear;
+				animation-fill-mode: forwards;
+			}
+			.wholeScreen{
+				user-select: none;
+				position: absolute;
+				top: 0px;
+				left: 0px;
+			}
+			@keyframes shrink{
+				0%{height: 10px; width: 10px;}
+				25%{height: 12px; width: 12px;}
+				99%{height: 0px; width: 0px; opacity: 1;}
+				100%{height: 0px; width: 0px; opacity: 0;}
+			}		
+			@keyframes orbit{
+				from{offset-distance: 0%;}
+				to{offset-distance: 100%;}
+			}

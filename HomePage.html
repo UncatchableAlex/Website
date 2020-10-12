@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>Alex Website Beta</title>
+		<link rel = "stylesheet" href = "Website_Code/CSS/Style_Sheet.css">
+		<script src = Website_Code/JS/ExpressionBuilderJSNative.js></script>
+		<script src = Website_Code/JS/MouseTranslator.js></script>
+		<script src = Website_Code/JS/OrbitPlanner.js></script>
+	</head>
+	<body>
+		<h1>This is Alex's Homepage</h1>
+		<section id="bodies" class = "wholeScreen">
+			<section id="bloops"></section>
+		</section>
+		<div class = "centered">
+			<div id="queryBox" class="border" style="top: 50%;">
+				<input type="text" id="params" value="24,11,444,21,89,211,33"/>
+				<input type="text" id="target" value="152061840"/>
+				<button type="button" onclick="runExpressionBuilder(document.getElementById('params').value, document.getElementById('target').value)">Run!</button>
+				<button type="button" onclick="makeOrbiters()">ORBIT!</button>
+				<button type="button" onclick="clearInterval(make);document.getElementById('a').setAttribute('style', 'animation-play-state: paused')">STOP</button>
+			</div>
+		</div>
+	</body>
+</html>
