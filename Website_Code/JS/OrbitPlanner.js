@@ -5,27 +5,37 @@ var bloopTimeout = 2000;
 var bloopRefresh = 80;
 var blockWidth = 150;
 var blockHeight = 150;
+var evacuateTime = 0.3;
 //how smooth the curves transitions are guarenteed to be. Higher number is smoother. Choose number between 0 and pi/2:
 var smoothness = Math.PI/6;
+var rules = new Array();
+var ss = document.styleSheets[0];
+var intervals = {};
 
-function makeOrbiters(){
+function makeOrbiters(idList = ids, dpoint = null){
 	// get the document's stylesheet:
-	var ss = document.styleSheets[0];
 	// for each id:
-	for(var i = 0; i < ids.length; i++){
+	for(var i = 0; i < idList.length; i++){
+		try{
+			var dropInPoint = dPoint[0] == null ? getOffScreenPoint() : dPoint;
+		} catch(error){
+			var dropInPoint = getOffScreenPoint();
+		}
 			var h = window.innerHeight, w = window.innerWidth;
-			var id = ids[i];
+			var id = idList[i];
 			// make new rule for the specific id and add it to the stylesheet:
-			ss.insertRule(makeRule(id));
+			ss.insertRule(makeRule(id, dropInPoint));
 			// make a new div element:
 			var orbiter = document.createElement("div");
 			// set its class to the stylesheet that was just created:
 			orbiter.setAttribute("class", id);
 			orbiter.setAttribute("id", id);
-			orbiter.addEventListener("mousedown", function(e){trackMovements(e)})
+			orbiter.addEventListener("mousedown", e => {receiveMouseDown(e)})
 			document.getElementById("bodies").appendChild(orbiter);
-			make = setInterval("makeBloop('" + id + "')", bloopRefresh);
-
+			intervals[id] = setInterval(makeBloop, bloopRefresh, id);
+			if(!ids.includes(id)){
+				ids.push(id);
+			}
 		}
 }
 
@@ -37,7 +47,6 @@ function killBloop(id){
 
 function makeBloop(id){
 	bloopNum = (bloopNum < 2000000) ? ++bloopNum : 0;
-
 	var node = document.getElementById(id);
 	var rect = node.getBoundingClientRect();
 	var left = (rect.left + rect.right) >> 1;
@@ -47,22 +56,27 @@ function makeBloop(id){
 	bloop.setAttribute("id", "bloop" + bloopNum);
 	bloop.setAttribute("style", "top: " + top + "px; left: " + left + "px;");
 	document.getElementById("bloops").appendChild(bloop);
-	setTimeout("killBloop('" + bloop.id + "')", bloopTimeout);
+	setTimeout(killBloop, bloopTimeout, bloop.id);
 }
 
-function makeRule(id){
-	var origin = getOffScreenPoint();
+function makeRule(id, dropInPoint){
+	if(rules.includes(id)){
+				var idx = rules.indexOf(id);
+				ss.deleteRule(idx);
+				rules = rules.splice(idx, 1);
+		}
+	rules.push(id);
 	// make a point to end at (don't be confused as to the name. It will make sense later):
-	var startPoint = getRandomPoint(origin);
+	var startPoint = getRandomPoint(dropInPoint);
 	// make a random first control point:
-	var firstCtrl = getRandomPoint(origin);
+	var firstCtrl = getFirstCtrlPoint(getRandomPoint(dropInPoint), dropInPoint);
 	// make a second control point (once again, the name will make sense later):
-	var prevCtrl = getSecondCtrlPoint(origin, firstCtrl, startPoint); 
+	var prevCtrl = getSecondCtrlPoint(dropInPoint, firstCtrl, startPoint); 
 	// these guys will be used later. Keep them null for now though:
 	var ctrlPoint2, ctrolPoint1, endPoint;
 	// start making a new rule:
 	var rule = "." + id + "{background: red; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
-				"top:0px; left: 0px; z: 200000; offset-path: path('M " + origin[0] + " " + origin[1] + " C " + firstCtrl[0] + " " +
+				"top:0px; left: 0px; z: 200000; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 				firstCtrl[1] + " " + prevCtrl[0] + " " + prevCtrl[1] + " " + startPoint[0] + " " + startPoint[1];
 	// make between 7 and 15 svg bezier curve paths:
 	var iterations = getRandomIntInRange(7, 15);
@@ -164,26 +178,30 @@ function getAngle(vecA, vecB){
 	return Math.acos(dot / (magA * magB));
 }
 
+// rotate vec by theta degrees preserving its magnitude
 function rotateVector(vec, theta){
 	var xcomponent = (vec[0] * Math.cos(theta)) - (vec[1] * Math.sin(theta));
 	var ycomponent = (vec[0] * Math.sin(theta)) + (vec[1] * Math.cos(theta));
 	return new Array(xcomponent, ycomponent);
 }
 
+// shorten/lengthen vec to have a magnitude of 1
 function normalizeVector(vec){
 	var mag = getDist(new Array(0,0), vec);
 	return new Array(vec[0] / mag, vec[1] / mag);
 }
 
+// make vec point in the opposite direction.
 function flipVector(vec){
 	return new Array(vec[0] * -1, vec[1] * -1);
 }
 
+// show where vec points to if it starts at startPoint
 function getVectorEndPoint(startPoint, vec){
 	return new Array(vec[0] + startPoint[0], vec[1] + startPoint[1]);
 }
 
-
+//get a random point where a block could be visible on screen.
 function getRandomPoint(startPoint = null){
 	var endPoint = new Array(getRandomIntInRange(0, window.innerWidth - 150), getRandomIntInRange(0, window.innerHeight - 150))
 	if(startPoint != null){
@@ -192,10 +210,10 @@ function getRandomPoint(startPoint = null){
 			endPoint[1] = getRandomIntInRange(0, window.innerHeight - 150);
 		}
 	}
-	//console.log("frameh: " + frameh + "\n framew: " + framew + "\n left: " + 150 + "\n top: " + 150)
 	return endPoint;
 }
 
+// get the distance between two points
 function getDist(p1, p2){
 	// distance formula: L = sqrt((x1-x2)^2 + (y1-y2)^2)
 	return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2)) << 0;
@@ -218,4 +236,43 @@ function getOffScreenPoint(){
 	} else {
 		return new Array(window.innerWidth + 200, window.innerHeight + 200);
 	}
+}
+
+function evacuateAllBodies(){
+	for(var i = 0; i < ids.length; i++){
+		var child = document.getElementById(ids[i]);
+		var id = child.id;
+		var rect = child.getBoundingClientRect();
+		document.getElementById("bodies").remove(child);
+		newNode = document.createElement("div")
+		newNode.id = id;
+		newNode.class = "beingDragged";
+		//evacuate(child.id, [rect.left << 0, rect.top << 0]);
+		evacuate(id, [500,500]);
+		}
+	}
+
+// make block with given ID run very far very quickly.
+function evacuate(id, dropInPoint){
+	var node = document.getElementById(id);
+	for(var i = 0; i < node.classList.length; i++){
+		node.classList.remove(node.classList[i]);
+	}
+	cmd = getRunStyle(dropInPoint);
+	node.setAttribute("style", cmd);
+	node.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
+	clearInterval(intervals[id])
+	setTimeout(makeOrbiters, bloopRefresh, [id])
+	//setTimeout(remakeBlock, 500, node.id);
+}
+
+function getRunStyle(dropInPoint){
+	var endPoint = getOffScreenPoint();
+	var firstCtrl = getFirstCtrlPoint(getRandomPoint(dropInPoint), dropInPoint);
+	var secondCtrl = getSecondCtrlPoint(dropInPoint, firstCtrl, endPoint);
+	var cmd = "background: red; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
+				"top:0px; left: 0px; z: 200000; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
+				firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
+				"'); offset-distance: 0%; animation: orbit; animation: orbit " + evacuateTime + "s linear; animation-fill-mode: forwards;";
+	return cmd;
 }
