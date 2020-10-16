@@ -48,6 +48,13 @@
 				height: 150px;
 				width: 150px;
 			}
+			.runner{
+				background: red;
+				position: absolute;
+				z-index: 100;
+				height: 150px;
+				width: 150px;
+			}
 			.bloop{
 				background: lime;
 				position: absolute;

@@ -22,9 +22,14 @@ function runExpressionBuilder(params, target){
     if(document.getElementById("answer") != null){
         document.getElementById("answer").remove();
     }
-    newDiv.innerHTML = buildExpression(nums, target);
-    newDiv.id = "answer";
-    document.getElementById("queryBox").appendChild(newDiv);
+    evacuateAll();
+    setTimeout(
+        () => {
+            newDiv.innerHTML = buildExpression(nums, target);
+            newDiv.id = "answer";
+            document.getElementById("queryBox").appendChild(newDiv);
+        }, evacuateTime * 1000
+    ) 
 }
 
 function buildExpression(list, target){

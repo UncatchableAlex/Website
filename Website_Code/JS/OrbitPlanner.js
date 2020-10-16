@@ -41,7 +41,11 @@ function makeOrbiters(idList = ids, dpoint = null){
 
 
 function killBloop(id){
-	document.getElementById(id).remove();
+	try{
+		document.getElementById(id).remove();
+	}catch(error){
+		console.log("Bloop already cleared. Moving on");
+	}
 }
 
 
@@ -60,12 +64,14 @@ function makeBloop(id){
 }
 
 function makeRule(id, dropInPoint){
-	if(rules.includes(id)){
-				var idx = rules.indexOf(id);
-				ss.deleteRule(idx);
-				rules = rules.splice(idx, 1);
+	if(ids.includes(id)){
+		rules = ss.rules
+		for(var j = 0; j < rules.length; j++){
+			if(rules[j].selectorText == ("." + id)){
+				ss.deleteRule(j);
+			}
 		}
-	rules.push(id);
+	}
 	// make a point to end at (don't be confused as to the name. It will make sense later):
 	var startPoint = getRandomPoint(dropInPoint);
 	// make a random first control point:
@@ -85,7 +91,6 @@ function makeRule(id, dropInPoint){
 		ctrlPoint1 = getFirstCtrlPoint(prevCtrl, startPoint);
 		// generate a random end point that is at least 500 px away from the starting point:
 		endPoint = getRandomPoint(startPoint);
-		// get a random second control point that is at least 500 px away from the starting point:
 		ctrlPoint2 = getSecondCtrlPoint(startPoint, ctrlPoint1, endPoint);
 		//ctrlPoint2 = getRandomPoint(startPoint);
 		// append the curve to our rule:
@@ -238,19 +243,20 @@ function getOffScreenPoint(){
 	}
 }
 
-function evacuateAllBodies(){
+function evacuateAll(){
 	for(var i = 0; i < ids.length; i++){
 		var child = document.getElementById(ids[i]);
 		var id = child.id;
 		var rect = child.getBoundingClientRect();
-		document.getElementById("bodies").remove(child);
-		newNode = document.createElement("div")
-		newNode.id = id;
-		newNode.class = "beingDragged";
-		//evacuate(child.id, [rect.left << 0, rect.top << 0]);
-		evacuate(id, [500,500]);
+		child.setAttribute("class", "runner")
+		child.style.top = "500px";
+		child.style.left = "500px";
+		setTimeout(() => {child.style.top = rect.top + "px"; child.style.left = rect.left + "px"}, 5)
+		setTimeout(evacuate, 10, id, [rect.left, rect.top])
 		}
-	}
+	document.getElementById("bloops").innerHTML = "";
+	//setTimeout(() => {document.getElementById("bodies").appendChild(bloops)}, evacuateTime * 2000);
+}
 
 // make block with given ID run very far very quickly.
 function evacuate(id, dropInPoint){
@@ -271,7 +277,7 @@ function getRunStyle(dropInPoint){
 	var firstCtrl = getFirstCtrlPoint(getRandomPoint(dropInPoint), dropInPoint);
 	var secondCtrl = getSecondCtrlPoint(dropInPoint, firstCtrl, endPoint);
 	var cmd = "background: red; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
-				"top:0px; left: 0px; z: 200000; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
+				"top:0px; left: 0px; z: 1; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 				firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
 				"'); offset-distance: 0%; animation: orbit; animation: orbit " + evacuateTime + "s linear; animation-fill-mode: forwards;";
 	return cmd;
