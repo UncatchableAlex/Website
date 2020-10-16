@@ -6,17 +6,15 @@ var bloopRefresh = 80;
 var blockWidth = 150;
 var blockHeight = 150;
 var evacuateTime = 0.3;
+var secsPerSegment = 5;
 //how smooth the curves transitions are guarenteed to be. Higher number is smoother. Choose number between 0 and pi/2:
 var smoothness = Math.PI/6;
 var rules = new Array();
 var ss = document.styleSheets[0];
 var intervals = {};
-
-makeOrbiters();
 function makeOrbiters(idList = ids, dpoint = null){
 	// get the document's stylesheet:
 	// for each id:
-	allRunning = false;
 	for(var i = 0; i < idList.length; i++){
 		try{
 			var dropInPoint = dPoint[0] == null ? getOffScreenPoint() : dPoint;
@@ -107,7 +105,7 @@ function makeRule(id, dropInPoint){
 	ctrlPoint2 = getSecondCtrlPoint(startPoint, ctrlPoint1, endPoint);
 	rule += (" C " + ctrlPoint1[0] + " " + ctrlPoint1[1] + " " + ctrlPoint2[0] + " " + ctrlPoint2[1] + " " + endPoint[0] + " " + endPoint[1]);
 	// append all this gibberish to complete a pretty pretty pretty animation rule:
-	rule += "'); offset-distance: 0%; animation: orbit; animation: orbit " + iterations * 5 + "s linear infinite; animation-fill-mode: forwards;}";
+	rule += "'); offset-distance: 0%; animation: orbit; animation: orbit " + iterations * secsPerSegment + "s linear infinite; animation-fill-mode: forwards;}";
 	console.log(rule);
 	return rule;
 }
@@ -245,31 +243,33 @@ function getOffScreenPoint(){
 	}
 }
 
-function evacuateAll(){
+function evacuateAll(rebuild = false){
 	for(var i = 0; i < ids.length; i++){
-		var child = document.getElementById(ids[i]);
-		var id = child.id;
-		var rect = child.getBoundingClientRect();
-		child.setAttribute("class", "runner")
-		child.style.top = "500px";
-		child.style.left = "500px";
-		setTimeout(() => {child.style.top = rect.top + "px"; child.style.left = rect.left + "px"}, 5)
-		setTimeout(evacuate, 10, id, [rect.left, rect.top])
-		}
+		var orbiter = document.getElementById(ids[i]);
+		var id = orbiter.id;
+		var rect = orbiter.getBoundingClientRect();
+		orbiter.setAttribute("class", "runner")
+		orbiter.style.top = "500px";
+		orbiter.style.left = "500px";
+		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 5)
+		setTimeout(evacuate, 10, id, [rect.left, rect.top], rebuild)
+	}
 	//setTimeout(() => {document.getElementById("bodies").appendChild(bloops)}, evacuateTime * 2000);
 }
 
 // make block with given ID run very far very quickly.
-function evacuate(id, dropInPoint){
-	var node = document.getElementById(id);
-	for(var i = 0; i < node.classList.length; i++){
-		node.classList.remove(node.classList[i]);
+function evacuate(id, dropInPoint, rebuild = true){
+	var orbiter = document.getElementById(id);
+	for(var i = 0; i < orbiter.classList.length; i++){
+		orbiter.classList.remove(orbiter.classList[i]);
 	}
 	cmd = getRunStyle(dropInPoint);
-	node.setAttribute("style", cmd);
-	node.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
+	orbiter.setAttribute("style", cmd);
+	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
 	clearInterval(intervals[id])
-	setTimeout(makeOrbiters, bloopRefresh, [id])
+	if(rebuild){
+		setTimeout(makeOrbiters, bloopRefresh, [id])
+	}
 	//setTimeout(remakeBlock, 500, node.id);
 }
 

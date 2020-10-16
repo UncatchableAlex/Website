@@ -2,12 +2,13 @@ var closest = Number.MAX_VALUE;
 var ops = ["+", "-", "*", "/"];
 
 function runExpressionBuilder(params, target){
+    closest = Number.MAX_VALUE;
     var target = parseInt(target.replace(" ", ""));
-    var errorMessage = "Error: Incorrect formatting in target field. Please try again"
+    var errorMessage = "Error: Incorrect formatting in target field. Please try again";
     if(isNaN(target)){
             throw errorMessage;
     } else if(target < 0){
-        throw "target must be greater than zero"
+        throw "target must be greater than zero";
     }
     var params = params.replace(" ", "").split(",");
     var nums = new Array();
@@ -16,22 +17,23 @@ function runExpressionBuilder(params, target){
         if(isNaN(num) || params.length == 0 || params[i].includes(".")){
             throw errorMessage;
         }
-        nums.push(num)
+        nums.push(num);
      }
     var newDiv = document.createElement("div")
     if(document.getElementById("answer") != null){
         document.getElementById("answer").remove();
     }
     document.getElementById("bloops").innerHTML = "";
-    evacuateAll();
-    setTimeout(() => {document.getElementById("bloops").innerHTML = "";}, evacuateTime * 800)
+    evacuateAll(false);
+    setTimeout(() => {document.getElementById("bloops").innerHTML = "";}, evacuateTime * 800);
     setTimeout(
         () => {
             document.getElementById("bloops").innerHTML = "";
             newDiv.innerHTML = buildExpression(nums, target);
             newDiv.id = "answer";
             document.getElementById("queryBox").appendChild(newDiv);
-        }, evacuateTime * 1000) 
+            makeOrbiters();
+        }, evacuateTime * 1000);
 }
 
 function buildExpression(list, target){
