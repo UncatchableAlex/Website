@@ -7,8 +7,8 @@
 		<script src = Website_Code/JS/MouseTranslator.js></script>
 		<script src = Website_Code/JS/OrbitPlanner.js></script>
 	</head>
-	<body>
-		<h1>This is Alex's Homepage</h1>
+	<body onload = "makeOrbiters()">
+		<h1>Alex's Projects</h1>
 		<section id="bodies" class = "wholeScreen">
 			<section id="bloops"></section>
 		</section>
@@ -17,7 +17,6 @@
 				<input type="text" id="params" value="24,11,444,21,89,211,33"/>
 				<input type="text" id="target" value="152061840"/>
 				<button type="button" onclick="runExpressionBuilder(document.getElementById('params').value, document.getElementById('target').value)">Run!</button>
-				<button type="button" onclick="makeOrbiters()">ORBIT!</button>
 			</div>
 		</div>
 	</body>

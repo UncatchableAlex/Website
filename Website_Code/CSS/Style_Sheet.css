@@ -1,6 +1,6 @@
 			html{
 				margin: 0px;
-				height: 100%;
+				min-height: 100%;
 				width: 100%;
 			}
 			body{
@@ -19,17 +19,18 @@
 				font-style: italic;
 				font-family: "blippo, fantasy";
 				color: lightslategrey;
+				user-select: none;
 			}
 			.border{
 				position: absolute;
 				background: lightskyblue;
 				width: 30%;
-				height: 20%;
+				min-height: 20%;
 			}
 			.header{
 				position: absolute;
 				width: 100%;
-				height: 10%;
+				min-height: 10%;
 				top: 0;
 				font-family: "blippo, fantasy";
 				font-size: xx-large;

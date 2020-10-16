@@ -22,14 +22,16 @@ function runExpressionBuilder(params, target){
     if(document.getElementById("answer") != null){
         document.getElementById("answer").remove();
     }
+    document.getElementById("bloops").innerHTML = "";
     evacuateAll();
+    setTimeout(() => {document.getElementById("bloops").innerHTML = "";}, evacuateTime * 800)
     setTimeout(
         () => {
+            document.getElementById("bloops").innerHTML = "";
             newDiv.innerHTML = buildExpression(nums, target);
             newDiv.id = "answer";
             document.getElementById("queryBox").appendChild(newDiv);
-        }, evacuateTime * 1000
-    ) 
+        }, evacuateTime * 1000) 
 }
 
 function buildExpression(list, target){

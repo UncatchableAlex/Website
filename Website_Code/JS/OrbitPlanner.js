@@ -12,9 +12,11 @@ var rules = new Array();
 var ss = document.styleSheets[0];
 var intervals = {};
 
+makeOrbiters();
 function makeOrbiters(idList = ids, dpoint = null){
 	// get the document's stylesheet:
 	// for each id:
+	allRunning = false;
 	for(var i = 0; i < idList.length; i++){
 		try{
 			var dropInPoint = dPoint[0] == null ? getOffScreenPoint() : dPoint;
@@ -33,9 +35,6 @@ function makeOrbiters(idList = ids, dpoint = null){
 			orbiter.addEventListener("mousedown", e => {receiveMouseDown(e)})
 			document.getElementById("bodies").appendChild(orbiter);
 			intervals[id] = setInterval(makeBloop, bloopRefresh, id);
-			if(!ids.includes(id)){
-				ids.push(id);
-			}
 		}
 }
 
@@ -69,8 +68,11 @@ function makeRule(id, dropInPoint){
 		for(var j = 0; j < rules.length; j++){
 			if(rules[j].selectorText == ("." + id)){
 				ss.deleteRule(j);
+				clearInterval(intervals[id])
 			}
 		}
+	} else {
+		ids.push(id);
 	}
 	// make a point to end at (don't be confused as to the name. It will make sense later):
 	var startPoint = getRandomPoint(dropInPoint);
@@ -254,7 +256,6 @@ function evacuateAll(){
 		setTimeout(() => {child.style.top = rect.top + "px"; child.style.left = rect.left + "px"}, 5)
 		setTimeout(evacuate, 10, id, [rect.left, rect.top])
 		}
-	document.getElementById("bloops").innerHTML = "";
 	//setTimeout(() => {document.getElementById("bodies").appendChild(bloops)}, evacuateTime * 2000);
 }
 
