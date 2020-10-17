@@ -68,7 +68,7 @@ function makeExpressionBuilderConsole(){
    	svg2.appendChild(rhsBox);
 
    	var goButton = document.createElement("button");
-   	goButton.style = "top: 45%; left: 43%; position: absolute; background-color: #e4e1ff;";
+   	goButton.style = "top: 41%; margin-left: auto; position: absolute; background-color: #e4e1ff;";
    	goButton.innerHTML = "GO!";
    	goButton.onclick = () => {runExpressionBuilder(input1.value, input2.value)};
    	ebpanel.append(goButton);
@@ -79,17 +79,18 @@ function makeExpressionBuilderConsole(){
    	ebpanel.appendChild(answerDisplay);
 
    	var desc = document.createElement("p")
-   	desc.innerHTML = "Welcome to the Equation Generator! Please enter eight or fewer comma separated integers into the left box and a " + 
-   					"single large integer into the right hand box. When you are ready, hit the go button and wait a few seconds. Your " +
-   					"browser will perform an exhaustive depth first search to form an aritmetic expression, using the numbers in the left box, " + 
-   					"that equals the number in the right box.  I love this example for so many reasons. It is simple, intuitive, and an accurate " +
-   					"demonstration of both the speed at which computers process information and the nature of exponential growth. <br><br> Try using only " +
+   	desc.innerHTML = "Welcome to the Equation Generator! Please enter eight or fewer comma-separated integers into the left box and a " + 
+   					"single large integer into the right box. When you are ready, hit the go button and wait a few seconds. Your " +
+   					"browser will perform an exhaustive depth-first search to form an arithmetic expression, using the numbers in the left box, " + 
+   					"which equals the number in the right box. <br><br> I love this example for so many reasons. It is simple, intuitive, and an accurate " +
+   					"demonstration of both the speed at which computers process information. Moreso, however, the recursive expression generation beautifully " +
+   					"exemplifies the nature of exponential growth. Try using only " +
    					"three or four numbers on the left side. It processes instantly, right? Now try eight numbers on the left side and a different " +
    					"larger number on the right. It's going to take quite a while because even though you only entered a few more numbers, " +
    					"the computer must process billions more permutations. How long do you think it would take with nine numbers? Or ten? <br><br>" +
    					"If the viewer takes anything away from this demo, it should be this: Use a long password to avoid the kind of brute force "+
-   					"attacks that this program mimics. Obviously the only thing that we are doing here is attacking an arbitary number, but the same " +
-   					"logic apply for cryptography."; 				
+   					"attacks that this program mimics. Obviously, the only thing that we are doing here is attacking an arbitrary number, but the same " +
+   					"logic applies to cryptography."; 				
    	desc.style.top = "50%";
    	desc.style.height = "35%";
    	ebpanel.appendChild(desc);
