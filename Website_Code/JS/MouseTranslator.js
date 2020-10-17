@@ -15,7 +15,7 @@ function receiveMouseDown(e){
 	window.requestAnimationFrame(
 		() => {
 				window.requestAnimationFrame(
-					() =>{
+					() => {
 						var secondRect = orbiter.getBoundingClientRect()
 						var secondPoint = [(secondRect.left + secondRect.right) / 2, (secondRect.top + secondRect.bottom) / 2];
 						console.log(secondRect);

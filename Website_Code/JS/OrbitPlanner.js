@@ -1,6 +1,5 @@
 var bloopNum;
-var ids = new Array("a", "b", "c", "d", "e");
-//var ids = new Array("a");
+var ids = new Map([["ExpBuild", "salmon"], ["b","red"], ["c","red"], ["d","red"], ["e","red"]]);
 var bloopTimeout = 2000;
 var bloopRefresh = 80;
 var blockWidth = 150;
@@ -11,18 +10,18 @@ var secsPerSegment = 5;
 var smoothness = Math.PI/6;
 var rules = new Array();
 var ss = document.styleSheets[0];
-var intervals = {};
-function makeOrbiters(idList = ids, dpoint = null){
+var intervals = new Map();
+function makeOrbiters(keys = Array.from(ids.keys()), dpoint = null){
 	// get the document's stylesheet:
 	// for each id:
-	for(var i = 0; i < idList.length; i++){
+	for(var i = 0; i < keys.length; i++){
+		var id = keys[i];
 		try{
 			var dropInPoint = dPoint[0] == null ? getOffScreenPoint() : dPoint;
 		} catch(error){
 			var dropInPoint = getOffScreenPoint();
 		}
 			var h = window.innerHeight, w = window.innerWidth;
-			var id = idList[i];
 			// make new rule for the specific id and add it to the stylesheet:
 			ss.insertRule(makeRule(id, dropInPoint));
 			// make a new div element:
@@ -32,7 +31,7 @@ function makeOrbiters(idList = ids, dpoint = null){
 			orbiter.setAttribute("id", id);
 			orbiter.addEventListener("mousedown", e => {receiveMouseDown(e)})
 			document.getElementById("bodies").appendChild(orbiter);
-			intervals[id] = setInterval(makeBloop, bloopRefresh, id);
+			intervals.set(id, setInterval(makeBloop, bloopRefresh, id));
 		}
 }
 
@@ -61,16 +60,16 @@ function makeBloop(id){
 }
 
 function makeRule(id, dropInPoint){
-	if(ids.includes(id)){
+	if(ids.has(id)){
 		rules = ss.rules
 		for(var j = 0; j < rules.length; j++){
 			if(rules[j].selectorText == ("." + id)){
 				ss.deleteRule(j);
-				clearInterval(intervals[id])
+				clearInterval(intervals.get(id))
 			}
 		}
 	} else {
-		ids.push(id);
+		ids.set(id[0], id[1]);
 	}
 	// make a point to end at (don't be confused as to the name. It will make sense later):
 	var startPoint = getRandomPoint(dropInPoint);
@@ -81,8 +80,8 @@ function makeRule(id, dropInPoint){
 	// these guys will be used later. Keep them null for now though:
 	var ctrlPoint2, ctrolPoint1, endPoint;
 	// start making a new rule:
-	var rule = "." + id + "{background: red; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
-				"top:0px; left: 0px; z: 200000; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
+	var rule = "." + id + "{background: " + ids.get(id) + "; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
+				"top:0px; left: 0px; z-index: 20; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 				firstCtrl[1] + " " + prevCtrl[0] + " " + prevCtrl[1] + " " + startPoint[0] + " " + startPoint[1];
 	// make between 7 and 15 svg bezier curve paths:
 	var iterations = getRandomIntInRange(7, 15);
@@ -244,15 +243,14 @@ function getOffScreenPoint(){
 }
 
 function evacuateAll(rebuild = false){
-	for(var i = 0; i < ids.length; i++){
-		var orbiter = document.getElementById(ids[i]);
-		var id = orbiter.id;
+	for(let id of ids.keys()){
+		var orbiter = document.getElementById(id);
 		var rect = orbiter.getBoundingClientRect();
 		orbiter.setAttribute("class", "runner")
 		orbiter.style.top = "500px";
 		orbiter.style.left = "500px";
-		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 5)
-		setTimeout(evacuate, 10, id, [rect.left, rect.top], rebuild)
+		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 10)
+		setTimeout(evacuate, 20, id, [rect.left, rect.top], false)
 	}
 	//setTimeout(() => {document.getElementById("bodies").appendChild(bloops)}, evacuateTime * 2000);
 }
@@ -263,22 +261,22 @@ function evacuate(id, dropInPoint, rebuild = true){
 	for(var i = 0; i < orbiter.classList.length; i++){
 		orbiter.classList.remove(orbiter.classList[i]);
 	}
-	cmd = getRunStyle(dropInPoint);
+	cmd = getRunStyle(dropInPoint, ids.get(id));
 	orbiter.setAttribute("style", cmd);
 	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
-	clearInterval(intervals[id])
+	clearInterval(intervals.get(id))
 	if(rebuild){
 		setTimeout(makeOrbiters, bloopRefresh, [id])
 	}
 	//setTimeout(remakeBlock, 500, node.id);
 }
 
-function getRunStyle(dropInPoint){
+function getRunStyle(dropInPoint, color){
 	var endPoint = getOffScreenPoint();
 	var firstCtrl = getFirstCtrlPoint(getRandomPoint(dropInPoint), dropInPoint);
 	var secondCtrl = getSecondCtrlPoint(dropInPoint, firstCtrl, endPoint);
-	var cmd = "background: red; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
-				"top:0px; left: 0px; z: 1; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
+	var cmd = "background: " + color + "; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
+				"top:0px; left: 0px; z-index: 1; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 				firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
 				"'); offset-distance: 0%; animation: orbit; animation: orbit " + evacuateTime + "s linear; animation-fill-mode: forwards;";
 	return cmd;

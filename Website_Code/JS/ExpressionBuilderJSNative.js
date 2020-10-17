@@ -31,7 +31,7 @@ function runExpressionBuilder(params, target){
             document.getElementById("bloops").innerHTML = "";
             newDiv.innerHTML = buildExpression(nums, target);
             newDiv.id = "answer";
-            document.getElementById("queryBox").appendChild(newDiv);
+            document.getElementById("answerDisplay").appendChild(newDiv);
             makeOrbiters();
         }, evacuateTime * 1000);
 }
