@@ -4,6 +4,7 @@
 				width: 100%;
 			}
 			body{
+				position: absolute;
 				background-color: black;
 				top: 0px;
 				left: 0px;
@@ -21,6 +22,19 @@
 				color: lightslategrey;
 				user-select: none;
 			}
+			h2{
+				position: relative;
+				top: 5%;
+				height: 10%;
+				flex-basis: 100%;
+				text-align: center;
+				margin-top: 0px;
+				margin-bottom: 0px;
+				font-size: 2em;
+				font-family: "blippo, fantasy";
+				color: lightslategrey;
+				user-select: none;
+			}
 			input{
 				 background: transparent;
 				  border: 0;
@@ -32,7 +46,7 @@
 				position: absolute;
 				padding: 5%;
 				margin: auto;
-				font-size: 1.5em;
+				font-size: 1.3em;
 				overflow: auto;
 			}
 			button{
@@ -50,14 +64,17 @@
 				min-height: 20%;
 			}
 			.console{
+				position: absolute;;
+				top: 35%;
+				left: 30%;
 				background: white;
 				border-style: solid;
 				border-width: 5vh;
-				position: relative;
-		 		margin: auto;
+				justify-content: center;
 		 		z-index: 300000000;
 		 		display: flex;
-		 		align-items: flex-start;
+		 		flex-wrap: wrap;
+		 		align-content: flex-start;
 			}
 			.beingDragged{
 				background: fuchsia;

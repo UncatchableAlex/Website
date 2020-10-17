@@ -5,6 +5,10 @@ function makeExpressionBuilderConsole(){
     ebpanel.id = "ebpanel";
     ebpanel.style = "width: 35vw; height: 50vh; border-color: mistyrose";
 
+    var title = document.createElement("h2");
+    title.innerHTML = "Expression Builder";
+    ebpanel.appendChild(title);
+
     var div1 = document.createElement("div")
    	div1.style = "height: 20%; width: 60%; position: relative;";
     div1.id = "div1";
@@ -18,8 +22,8 @@ function makeExpressionBuilderConsole(){
 
     var input1 = document.createElement("input")
     input1.type = "text";
-    input1.style = "bottom: 5%; left: 18%; height: 40%; text-align: center; position: absolute;";
-    input1.placeholder = "24,11,444,21,89,211,33";
+    input1.style = "bottom: 5%; left: 10%; text-align: center; position: absolute;";
+    input1.placeholder = "ex: 24,11,444,21,89,211,33";
     div1.appendChild(input1);
 
     var absBox1 = svg1.getBoundingClientRect();
@@ -42,7 +46,7 @@ function makeExpressionBuilderConsole(){
     var input2 = document.createElement("input")
     input2.type = "text";
     input2.style = "bottom: 5%; left: 12%; height: 40%; width: 72%; text-align: center;";
-    input2.placeholder = "152061840";
+    input2.placeholder = "ex: 152061840";
     div2.appendChild(input2);
 
    	var svg2 = document.createElementNS("http://www.w3.org/2000/svg", "svg");  
@@ -64,7 +68,7 @@ function makeExpressionBuilderConsole(){
    	svg2.appendChild(rhsBox);
 
    	var goButton = document.createElement("button");
-   	goButton.style = "top: 25%; left: 43%; position: absolute; background-color: #e4e1ff;";
+   	goButton.style = "top: 45%; left: 43%; position: absolute; background-color: #e4e1ff;";
    	goButton.innerHTML = "GO!";
    	goButton.onclick = () => {runExpressionBuilder(input1.value, input2.value)};
    	ebpanel.append(goButton);
