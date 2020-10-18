@@ -63,10 +63,12 @@ function receiveMouseUp(e){
 		makeConsole(orbiter.id);
 		makeTransparent = true;
 	}
-	evacuate(orbiter.id, [e.clientX, e.clientY], true)
+	evacuate(orbiter.id, [e.clientX, e.clientY])
 	if(makeTransparent){
 		orbiter.style.background = "transparent";
+		clearInterval(intervals.get(orbiter.id));
 	}
+	setTimeout(makeOrbiters, evacuateTime, [orbiter.id]);
 }
 
 function getBlockAngle(width, rad = true){
@@ -76,7 +78,11 @@ function getBlockAngle(width, rad = true){
 
 function windowResizeDone(){
 	clearTimeout(windowResize);
-	windowResize = setTimeout(evacuateAll, 500, true);
+	windowResize = setTimeout( 
+		()=> {
+			evacuateAll(); 
+			setTimeout(makeOrbiters, evacuateTime);
+		}, 500);
 }
 
 

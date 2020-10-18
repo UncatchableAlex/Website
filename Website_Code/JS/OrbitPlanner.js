@@ -242,7 +242,7 @@ function getOffScreenPoint(){
 	}
 }
 
-function evacuateAll(rebuild = false){
+function evacuateAll(){
 	for(let id of ids.keys()){
 		var orbiter = document.getElementById(id);
 		var rect = orbiter.getBoundingClientRect();
@@ -250,13 +250,13 @@ function evacuateAll(rebuild = false){
 		orbiter.style.top = "500px";
 		orbiter.style.left = "500px";
 		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 10)
-		setTimeout(evacuate, 20, id, [rect.left, rect.top], rebuild)
+		setTimeout(evacuate, 20, id, [rect.left, rect.top])
 	}
 	//setTimeout(() => {document.getElementById("bodies").appendChild(bloops)}, evacuateTime * 2000);
 }
 
 // make block with given ID run very far very quickly.
-function evacuate(id, dropInPoint, rebuild = true){
+function evacuate(id, dropInPoint){
 	var orbiter = document.getElementById(id);
 	for(var i = 0; i < orbiter.classList.length; i++){
 		orbiter.classList.remove(orbiter.classList[i]);
@@ -264,11 +264,7 @@ function evacuate(id, dropInPoint, rebuild = true){
 	cmd = getRunStyle(dropInPoint, ids.get(id));
 	orbiter.setAttribute("style", cmd);
 	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
-	//clearInterval(intervals.get(id))
-	if(rebuild){
-		setTimeout(makeOrbiters, bloopRefresh, [id])
-	}
-	//setTimeout(remakeBlock, 500, node.id);
+	clearInterval(intervals.get(id))
 }
 
 function getRunStyle(dropInPoint, color){
