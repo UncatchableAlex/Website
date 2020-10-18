@@ -1,18 +1,44 @@
+var currentlyOpen;
+function makeConsole(id){
+	switch(id){
+		case("expBuild"): 
+			makeExpressionBuilderConsole();
+			break;
+		default:
+			makeBlackConsole();
+			break;
+	}
+}
+
+function receiveBgroundClick(){
+	switch(currentlyOpen){
+		case("expBuild"):
+			document.getElementById("ebPanel").remove();
+			break;
+		case("blank"):
+			document.getElementById("blank").remove();
+			break;
+		default:
+			break;
+	}
+}
+
 function makeExpressionBuilderConsole(){
-    var ebpanel = document.createElement("div");
-    ebpanel.setAttribute("class", "console");
-    document.body.appendChild(ebpanel);
-    ebpanel.id = "ebpanel";
-    ebpanel.style = "width: 35vw; height: 50vh; border-color: mistyrose";
+	currentlyOpen = "expBuild";
+    var ebPanel = document.createElement("div");
+    ebPanel.setAttribute("class", "console");
+    document.body.appendChild(ebPanel);
+    ebPanel.id = "ebPanel";
+    ebPanel.style = "width: 35vw; height: 50vh; border-color: mistyrose";
 
     var title = document.createElement("h2");
     title.innerHTML = "Expression Builder";
-    ebpanel.appendChild(title);
+    ebPanel.appendChild(title);
 
     var div1 = document.createElement("div")
    	div1.style = "height: 20%; width: 60%; position: relative;";
     div1.id = "div1";
-    ebpanel.appendChild(div1);
+    ebPanel.appendChild(div1);
 
 	var svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");    
     //svg1.setAttribute("viewBox", "0 0 60 20");
@@ -41,11 +67,11 @@ function makeExpressionBuilderConsole(){
    	var div2 = document.createElement("div");
    	div2.style = "width: 40%; height: 20%; position: relative";
     div2.id = "div2";
-    ebpanel.appendChild(div2);
+    ebPanel.appendChild(div2);
 
     var input2 = document.createElement("input")
     input2.type = "text";
-    input2.style = "bottom: 5%; left: 12%; height: 40%; width: 72%; text-align: center;";
+    input2.style = "bottom: 5%; left: 12%; width: 72%; text-align: center;";
     input2.placeholder = "ex: 152061840";
     div2.appendChild(input2);
 
@@ -71,12 +97,12 @@ function makeExpressionBuilderConsole(){
    	goButton.style = "top: 41%; margin-left: auto; position: absolute; background-color: #e4e1ff;";
    	goButton.innerHTML = "GO!";
    	goButton.onclick = () => {runExpressionBuilder(input1.value, input2.value)};
-   	ebpanel.append(goButton);
+   	ebPanel.append(goButton);
 
    	var answerDisplay = document.createElement("div");
    	answerDisplay.id = "answerDisplay";
    	answerDisplay.setAttribute("class", "answerDisplay");
-   	ebpanel.appendChild(answerDisplay);
+   	ebPanel.appendChild(answerDisplay);
 
    	var desc = document.createElement("p")
    	desc.innerHTML = "Welcome to the Expression Builder! Please enter eight or fewer comma-separated integers into the left box and a " + 
@@ -94,5 +120,17 @@ function makeExpressionBuilderConsole(){
    					"logic applies to cryptography."; 				*/
    	desc.style.top = "50%";
    	desc.style.height = "35%";
-   	ebpanel.appendChild(desc);
+   	ebPanel.appendChild(desc);
+}
+
+function makeBlackConsole(){
+	currentlyOpen = "blank";
+	var blank = document.createElement("div");
+    blank.setAttribute("class", "console");
+    document.body.appendChild(blank);
+    blank.id = "blank";
+    blank.style = "width: 35vw; height: 50vh; border-color: hotpink";
+    var title = document.createElement("h2");
+    title.innerHTML = "This block doesn't have a code project bound to it yet. Try another color. Click anywhere else onscreen to remove this panel.";
+    blank.appendChild(title);
 }

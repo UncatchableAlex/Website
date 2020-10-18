@@ -15,7 +15,7 @@ function receiveMouseDown(e){
 	window.requestAnimationFrame(
 		() => {
 				window.requestAnimationFrame(
-					() => {
+					() =>{
 						var secondRect = orbiter.getBoundingClientRect()
 						var secondPoint = [(secondRect.left + secondRect.right) / 2, (secondRect.top + secondRect.bottom) / 2];
 						console.log(secondRect);
@@ -24,6 +24,7 @@ function receiveMouseDown(e){
 						orbiter.style.top = e.clientY - offsetTop;
 						orbiter.style.left = e.clientX - offsetLeft;
 						orbiter.setAttribute("class", "beingDragged");
+						orbiter.style.background = ids.get(orbiter.id);
 						orbiter.style.transform = "rotate(" + origAngle + "rad)";	
 						receiveMouseMove(e);
 						window.addEventListener("mousemove", receiveMouseMove);
@@ -37,9 +38,9 @@ function receiveMouseDown(e){
 }
 
 function receiveMouseMove(e){
-	var newPos = [e.clientX - offsetTop, e.clientY - offsetLeft];
-	orbiter.style.left = newPos[0] + "px";
+	var newPos = [e.clientX - offsetLeft, e.clientY - offsetTop];
 	orbiter.style.top = newPos[1] + "px";
+	orbiter.style.left = newPos[0] + "px";
 	var distToCenter = getDist(center, newPos);
 	var newAngle = (origAngle / origDist) * distToCenter;
 	console.log(distToCenter);
@@ -51,7 +52,20 @@ function receiveMouseUp(e){
 	window.removeEventListener("mousemove", receiveMouseMove);
 	window.removeEventListener("mouseup", receiveMouseUp);
 	receiveMouseMove(e);
+	var RecepRect = document.getElementById("receptacle").getBoundingClientRect();
+	var orbiterRect = orbiter.getBoundingClientRect(); 
+	var orbiterCenter = [(orbiterRect.left + orbiterRect.right) / 2, (orbiterRect.top + orbiterRect.bottom) / 2];
+	var makeTransparent = false;
+	if(getDist(orbiterCenter, center) < blockWidth){
+		orbiter.style.top = center[0] - (blockWidth / 2);
+		orbiter.style.left = center[1] - (blockWidth / 2);
+		makeConsole(orbiter.id);
+		makeTransparent = true;
+	}
 	evacuate(orbiter.id, [e.clientX, e.clientY])
+	if(makeTransparent){
+		orbiter.style.background = "transparent";
+	}
 }
 
 function getBlockAngle(width, rad = true){

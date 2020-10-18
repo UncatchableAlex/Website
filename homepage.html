@@ -17,12 +17,22 @@
 
 		  gtag('config', 'UA-180653985-1');
 		</script>
+		<script>
+			function onloadSeq(){
+				makeOrbiters();
+				document.getElementById("background").addEventListener("click", receiveBgroundClick);
+			}
+		</script>
 
 	</head>
-	<body onload = "makeOrbiters(); makeExpressionBuilderConsole();">
+	<body onload = "onloadSeq();">
 		<h1>Alex's Projects</h1>
-		<section id="bodies" class = "wholeScreen">
+		<section id="bodies">
 			<section id="bloops"></section>
+			<section>
+				<div id="background" class="wholeScreen"></div>
+			</section>
 		</section>
+		<div id = "receptacle" class = "receptacle">Place Orbiter Here</div>
 	</body>
 </html>

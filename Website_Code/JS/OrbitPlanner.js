@@ -1,5 +1,5 @@
 var bloopNum;
-var ids = new Map([["ExpBuild", "salmon"], ["b","red"], ["c","red"], ["d","red"], ["e","red"]]);
+var ids = new Map([["expBuild", "salmon"], ["b","red"], ["c","red"], ["d","red"], ["e","red"]]);
 var bloopTimeout = 2000;
 var bloopRefresh = 80;
 var blockWidth = 150;
