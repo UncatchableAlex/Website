@@ -30,7 +30,7 @@
 				text-align: center;
 				margin-top: 0px;
 				margin-bottom: 0px;
-				font-size: 2em;
+				font-size: 2vw;
 				font-family: "blippo, fantasy";
 				color: lightslategrey;
 				user-select: none;
@@ -108,7 +108,7 @@
 				width: 100%;
 			}
 			.answerDisplay{
-				font-size: 1.4em;
+				font-size: 1.4vw;
 				text-align: center;
 				position: absolute;
 				top: 31%;

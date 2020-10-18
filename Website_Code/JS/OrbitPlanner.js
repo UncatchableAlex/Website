@@ -1,5 +1,5 @@
 var bloopNum;
-var ids = new Map([["expBuild", "salmon"], ["b","red"], ["c","red"], ["d","red"], ["e","red"]]);
+var ids = new Map([["expBuild", "salmon"], ["credits","aqua"], ["about", "gold"], ["d","red"], ["e","red"]]);
 var bloopTimeout = 2000;
 var bloopRefresh = 80;
 var blockWidth = 150;
@@ -264,7 +264,7 @@ function evacuate(id, dropInPoint, rebuild = true){
 	cmd = getRunStyle(dropInPoint, ids.get(id));
 	orbiter.setAttribute("style", cmd);
 	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
-	clearInterval(intervals.get(id))
+	//clearInterval(intervals.get(id))
 	if(rebuild){
 		setTimeout(makeOrbiters, bloopRefresh, [id])
 	}

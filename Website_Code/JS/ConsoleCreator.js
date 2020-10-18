@@ -1,8 +1,15 @@
 var currentlyOpen;
+var borders = new Map([["exBuild", "mistyrose"], ["blank", "hotpink"], ["credits", "powderblue"], ["about", "lightgoldenrodyellow"]]);
 function makeConsole(id){
 	switch(id){
 		case("expBuild"): 
 			makeExpressionBuilderConsole();
+			break;
+		case("credits"):
+			makeCreditsConsole();
+			break;
+		case("about"):
+			makeAboutConsole();
 			break;
 		default:
 			makeBlackConsole();
@@ -11,34 +18,24 @@ function makeConsole(id){
 }
 
 function receiveBgroundClick(){
-	switch(currentlyOpen){
-		case("expBuild"):
-			document.getElementById("ebPanel").remove();
-			break;
-		case("blank"):
-			document.getElementById("blank").remove();
-			break;
-		default:
-			break;
-	}
+	var consoles = document.querySelectorAll(".console")
+	consoles.forEach(console => console.remove());
+	/*try{
+		document.getElementById(currentlyOpen).remove();
+	} catch(error){
+		console.log("No panels open. Nothing to remove...")
+	}*/
 }
 
 function makeExpressionBuilderConsole(){
-	currentlyOpen = "expBuild";
-    var ebPanel = document.createElement("div");
-    ebPanel.setAttribute("class", "console");
-    document.body.appendChild(ebPanel);
-    ebPanel.id = "ebPanel";
-    ebPanel.style = "width: 35vw; height: 50vh; border-color: mistyrose";
+	var expBuild = makeGenericConsoleTemplate("exBuild");
 
-    var title = document.createElement("h2");
-    title.innerHTML = "Expression Builder";
-    ebPanel.appendChild(title);
+    expBuild.appendChild(makeTitle("Expression Builder"));
 
     var div1 = document.createElement("div")
    	div1.style = "height: 20%; width: 60%; position: relative;";
     div1.id = "div1";
-    ebPanel.appendChild(div1);
+    expBuild.appendChild(div1);
 
 	var svg1 = document.createElementNS("http://www.w3.org/2000/svg", "svg");    
     //svg1.setAttribute("viewBox", "0 0 60 20");
@@ -67,7 +64,7 @@ function makeExpressionBuilderConsole(){
    	var div2 = document.createElement("div");
    	div2.style = "width: 40%; height: 20%; position: relative";
     div2.id = "div2";
-    ebPanel.appendChild(div2);
+    expBuild.appendChild(div2);
 
     var input2 = document.createElement("input")
     input2.type = "text";
@@ -97,16 +94,16 @@ function makeExpressionBuilderConsole(){
    	goButton.style = "top: 41%; margin-left: auto; position: absolute; background-color: #e4e1ff;";
    	goButton.innerHTML = "GO!";
    	goButton.onclick = () => {runExpressionBuilder(input1.value, input2.value)};
-   	ebPanel.append(goButton);
+   	expBuild.append(goButton);
 
    	var answerDisplay = document.createElement("div");
    	answerDisplay.id = "answerDisplay";
    	answerDisplay.setAttribute("class", "answerDisplay");
-   	ebPanel.appendChild(answerDisplay);
+   	expBuild.appendChild(answerDisplay);
 
-   	var desc = document.createElement("p")
+   	var desc = document.createElement("p");
    	desc.innerHTML = "Welcome to the Expression Builder! Please enter eight or fewer comma-separated integers into the left box and a " + 
-   					"single large positive integer into the right box. When you are ready, hit the \"go\" button and wait a few seconds. Your " +
+   					"single large positive integer (10E4-10E6) into the right box. When you are ready, hit the \"go\" button and wait a few seconds. Your " +
    					"browser will perform an exhaustive depth-first search to form an arithmetic expression, using the numbers in the left box, " + 
    					"which equals the number in the right box. <br><br> I love this example for so many reasons. It is simple, intuitive, and an accurate " +
    					"demonstration of the speed at which computers process information. Moreso, however, the recursive expression generation beautifully " +
@@ -120,17 +117,97 @@ function makeExpressionBuilderConsole(){
    					"logic applies to cryptography."; 				*/
    	desc.style.top = "50%";
    	desc.style.height = "35%";
-   	ebPanel.appendChild(desc);
+   	expBuild.appendChild(desc);
+}
+
+function makeCreditsConsole(){
+	credits = makeGenericConsoleTemplate("credits");
+	credits.appendChild(makeTitle("Credits"));
+	credits.id = "credits";
+	var desc = document.createElement("p");
+	desc.innerHTML = "Believe it or not, this was my first actual attempt at making a website. There were ups and downs, but for the most part, " +
+					"things went pretty well and I am proud to now have a (very) small piece of the internet to call my own. That being said, I " +
+					"would be a fool not to give a shout-out to the following people and organizations who helped make this endeavor possible: <br><br>" +
+
+					"Professor David Chiu: For teaching me to care less about how things work and more about " + italicize("why") + " they work. An" +
+					"d, of course, for a clutch professor recommendation. Thank you. <br><br>" + 
+
+					"Professor Sigrun Bodine: For making me a calculus wizard. This site is largely based on the vector section of your mult" +
+					"i class. Also, thank you so much for your letter of recommendation. It means a lot.<br><br>" + 
+
+					"Duncan M: CS extraordinaire and phone-a-friend. He suggested I use web assembly for this project. Never has anyone had more misplaced confide" +
+					"nce in another human being. <br><br>" + 
+
+					"Google: Here's the obligatory code citation to Google. In the head of this page's HTML, I have a copy-pasted a Google Analyti" +
+					"cs tag to track usage. Those 5ish lines of code are NOT mine. Thanks, Google. <br><br>" +
+
+					"Alex M (Humble Cornell Applicant): I wrote the other 700 lines of code myself using the prior knowledge given to me by the aforementioned people.";
+	desc.style.top = "16%";
+	desc.style.bottom = "5%";
+	credits.appendChild(desc);
+}
+
+function makeAboutConsole(){
+	about = makeGenericConsoleTemplate("about")
+	about.appendChild(makeTitle("About"));
+	about.id = "about";
+	var desc = document.createElement("p");
+	desc.innerHTML = "\tThere were some parts of this project that were particularly challenging, and some that I have yet to figure out." + 
+					" For example, I spent " + italicize("days") + " trying to get div elements to switch from one animation to another. " +
+					"For some reason, there was hardly any documentation online of people trying to accomplish a similar goal, and I am" +
+					" led to believe that it is a very niche dilemma that doesn't occur very often. Regardless, I ended up solving the " +
+					"problem by dropping the animation entirely, changing the element's style, and waiting for the next repaint before " +
+					"assigning it a new animation. It is an ugly solution but it seems to work. <br><br>" +
+
+					"\tAdditionally, while the browser is working on a project demonstration, the blocks can't easily be animating becaus" +
+					"e of how JavaScript doesn't support threading. Instead, I dodged this problem by making the blocks evacuate the sc" +
+					"reen until demonstration is complete. <br><br>" +
+
+					"\tThe block animation, as a whole, was possibly the largest challenge. To avoid having to use the repaint strategy, " +
+					"each block follows a predefined path, as opposed to having its path generated in real-time. Essentially, the paths" +
+					" repeat at scheduled intervals, with the repeat point happening off screen. A little smoke and mirrors worked nice" +
+					"ly here. <br><br>" +
+
+					"\tThe paths themselves originally forced the blocks to make extremely sharp turns which were unpleasent to watch. " +
+					"Once again, this problem was pretty much undocumented and I had to come up with something on my own. I eventuall" +
+					"y found a proceedure for choosing bezier curve control points that make much shallower turns.<br><br>" + 
+
+					"\tFinally, it was necessary to find the angle of an element mid animation for when the user attempts to pick it up. "+
+					"I initially tried solving this geometrically using the element's bounding rectangle and inferring what it's angle " +
+					"must be to fit inside such a shape. Unfortunately, there are always two possible orientations and it was impossible" +
+					" to infer which one was correct from looking only at one frame. Instead, I simply waited for two frames to pass, and calc"+
+					"ulated the inverse tangent of its motion's slope.<br><br>" +
+
+					"\tGoing forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves";
+	desc.style.top = "16%";
+	desc.style.bottom = "5%";
+	about.appendChild(desc);
 }
 
 function makeBlackConsole(){
-	currentlyOpen = "blank";
-	var blank = document.createElement("div");
-    blank.setAttribute("class", "console");
-    document.body.appendChild(blank);
-    blank.id = "blank";
-    blank.style = "width: 35vw; height: 50vh; border-color: hotpink";
+	var blank = makeGenericConsoleTemplate("blank");
     var title = document.createElement("h2");
-    title.innerHTML = "This block doesn't have a code project bound to it yet. Try another color. Click anywhere else onscreen to remove this panel.";
+    title.innerHTML = "This block doesn't have a code project bound to it yet. Try another color. " +
+     					"Click anywhere else onscreen to remove this panel.";
     blank.appendChild(title);
+}
+
+function makeGenericConsoleTemplate(name){
+	currentlyOpen = name;
+	var panel = document.createElement("div");
+    panel.setAttribute("class", "console");
+    document.body.appendChild(panel);
+    panel.id = name;
+    panel.style = "width: 35vw; height: 50vh; border-color: " + borders.get(name);
+    return panel;
+}
+
+function makeTitle(contents){
+	title = document.createElement("h2");
+	title.innerHTML = contents;
+	return title;
+}
+
+function italicize(str){
+	return str.italics();
 }

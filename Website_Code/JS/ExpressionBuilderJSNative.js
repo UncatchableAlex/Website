@@ -121,5 +121,22 @@ function getRes(list, target, i, j, op){
 }
 
 function expandExpression(first, second, curr, op, numToReplace){
-    return curr.replace(numToReplace.toString(), "(" + first + " " + op + " " + second + ")");
+    var strNtr = numToReplace.toString();
+    var insertExp = "(" + first + " " + op + " " + second + ")";
+    for(var i = strNtr.length; i <= curr.length; i++){
+        var scope = curr.substring(i - strNtr.length, i); 
+        if(scope == strNtr){
+            var nextChar = curr.charAt(i);
+            try{
+                var prevChar = curr.charAt(i - strNtr.length - 1);
+            } catch(error){
+                var prevChar = ".";
+            }
+            if((nextChar < '0' || nextChar > '9') && (prevChar < '0' || prevChar > '9')){
+                var res = curr.substring(0, i - strNtr.length) + insertExp + curr.substring(i);
+                return res;
+            }
+        }
+    }
+    //return curr.replace(numToReplace.toString(), "(" + first + " " + op + " " + second + ")");
 }

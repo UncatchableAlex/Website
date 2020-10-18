@@ -62,7 +62,7 @@ function receiveMouseUp(e){
 		makeConsole(orbiter.id);
 		makeTransparent = true;
 	}
-	evacuate(orbiter.id, [e.clientX, e.clientY])
+	evacuate(orbiter.id, [e.clientX, e.clientY], true)
 	if(makeTransparent){
 		orbiter.style.background = "transparent";
 	}
