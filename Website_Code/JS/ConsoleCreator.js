@@ -103,7 +103,7 @@ function makeExpressionBuilderConsole(){
 
    	var desc = document.createElement("p");
    	desc.innerHTML = "Welcome to the Expression Builder! Please enter eight or fewer comma-separated integers into the left box and a " + 
-   					"single large positive integer (10E4-10E6) into the right box. When you are ready, hit the \"go\" button and wait a few seconds. Your " +
+   					"single large positive integer (10E4-10E8) into the right box. When you are ready, hit the \"go\" button and wait a few seconds. Your " +
    					"browser will perform an exhaustive depth-first search to form an arithmetic expression, using the numbers in the left box, " + 
    					"which equals the number in the right box. <br><br> I love this example for so many reasons. It is simple, intuitive, and an accurate " +
    					"demonstration of the speed at which computers process information. Moreso, however, the recursive expression generation beautifully " +
@@ -126,8 +126,8 @@ function makeCreditsConsole(){
 	credits.id = "credits";
 	var desc = document.createElement("p");
 	desc.innerHTML = "Believe it or not, this was my first actual attempt at making a website. There were ups and downs, but for the most part, " +
-					"things went pretty well and I am proud to now have a (very) small piece of the internet to call my own. That being said, I " +
-					"would be a fool not to give a shout-out to the following people and organizations who helped make this endeavor possible: <br><br>" +
+					"things went pretty well and I am proud to now own a (very) small piece of the internet. That being said, I " +
+					"would be a fool not to give shout-outs to the following people and organizations who helped make this endeavor possible: <br><br>" +
 
 					"Professor David Chiu: For teaching me to care less about how things work and more about " + italicize("why") + " they work. An" +
 					"d, of course, for a clutch professor recommendation. Thank you. <br><br>" + 
@@ -135,10 +135,10 @@ function makeCreditsConsole(){
 					"Professor Sigrun Bodine: For making me a calculus wizard. This site is largely based on the vector section of your mult" +
 					"i class. Also, thank you so much for your letter of recommendation. It means a lot.<br><br>" + 
 
-					"Duncan M: CS extraordinaire and phone-a-friend. He suggested I use web assembly for this project. Never has anyone had more misplaced confide" +
+					"Duncan M: CS extraordinaire and phone-a-friend. He suggested I use web assembly for this project. Never has anyone misplaced more confide" +
 					"nce in another human being. <br><br>" + 
 
-					"Google: Here's the obligatory code citation to Google. In the head of this page's HTML, I have a copy-pasted a Google Analyti" +
+					"Google: Here's the obligatory code citation for Google. In the head of this page's HTML, I have a copy-pasted a Google Analyti" +
 					"cs tag to track usage. Those 5ish lines of code are NOT mine. Thanks, Google. <br><br>" +
 
 					"Alex M (Humble Cornell Applicant): I wrote the other 700 lines of code myself using the prior knowledge given to me by the aforementioned people.";
@@ -178,7 +178,7 @@ function makeAboutConsole(){
 					" to infer which one was correct from looking only at one frame. Instead, I simply waited for two frames to pass, and calc"+
 					"ulated the inverse tangent of its motion's slope.<br><br>" +
 
-					"\tGoing forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves";
+					"\tGoing forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves.";
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
 	about.appendChild(desc);
