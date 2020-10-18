@@ -6,6 +6,7 @@ var origDist;
 var origAngle;
 var center;
 var windowResize = -1;
+var remakeOrbiters = -1;
 function receiveMouseDown(e){
 	center = [(window.innerWidth - blockWidth) / 2, (window.innerHeight - blockHeight) / 2];
 	orbiter = e.path[0];
@@ -56,19 +57,18 @@ function receiveMouseUp(e){
 	var RecepRect = document.getElementById("receptacle").getBoundingClientRect();
 	var orbiterRect = orbiter.getBoundingClientRect(); 
 	var orbiterCenter = [(orbiterRect.left + orbiterRect.right) / 2, (orbiterRect.top + orbiterRect.bottom) / 2];
-	var makeTransparent = false;
+	var remove = false;
 	if(getDist(orbiterCenter, center) < blockWidth){
 		orbiter.style.top = center[0] - (blockWidth / 2);
 		orbiter.style.left = center[1] - (blockWidth / 2);
 		makeConsole(orbiter.id);
-		makeTransparent = true;
+		remove = true;
+		orbiter.remove();
 	}
-	evacuate(orbiter.id, [e.clientX, e.clientY])
-	if(makeTransparent){
-		orbiter.style.background = "transparent";
-		clearInterval(intervals.get(orbiter.id));
+	if(!remove){
+		evacuate(orbiter.id, [e.clientX, e.clientY])
 	}
-	setTimeout(makeOrbiters, evacuateTime, [orbiter.id]);
+	makeOrbiters([orbiter.id]);
 }
 
 function getBlockAngle(width, rad = true){
@@ -80,7 +80,7 @@ function windowResizeDone(){
 	clearTimeout(windowResize);
 	windowResize = setTimeout( 
 		()=> {
-			evacuateAll(); 
+			evacuateAll();
 			setTimeout(makeOrbiters, evacuateTime);
 		}, 500);
 }

@@ -31,6 +31,7 @@ function makeOrbiters(keys = Array.from(ids.keys()), dpoint = null){
 			orbiter.setAttribute("id", id);
 			orbiter.addEventListener("mousedown", e => {receiveMouseDown(e)})
 			document.getElementById("bodies").appendChild(orbiter);
+			clearInterval(intervals.get(id));
 			intervals.set(id, setInterval(makeBloop, bloopRefresh, id));
 		}
 }
@@ -65,7 +66,6 @@ function makeRule(id, dropInPoint){
 		for(var j = 0; j < rules.length; j++){
 			if(rules[j].selectorText == ("." + id)){
 				ss.deleteRule(j);
-				clearInterval(intervals.get(id))
 			}
 		}
 	} else {
@@ -252,7 +252,6 @@ function evacuateAll(){
 		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 10)
 		setTimeout(evacuate, 20, id, [rect.left, rect.top])
 	}
-	//setTimeout(() => {document.getElementById("bodies").appendChild(bloops)}, evacuateTime * 2000);
 }
 
 // make block with given ID run very far very quickly.
@@ -264,7 +263,6 @@ function evacuate(id, dropInPoint){
 	cmd = getRunStyle(dropInPoint, ids.get(id));
 	orbiter.setAttribute("style", cmd);
 	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
-	clearInterval(intervals.get(id))
 }
 
 function getRunStyle(dropInPoint, color){
