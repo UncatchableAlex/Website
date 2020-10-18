@@ -20,11 +20,6 @@ function makeConsole(id){
 function receiveBgroundClick(){
 	var consoles = document.querySelectorAll(".console")
 	consoles.forEach(console => console.remove());
-	/*try{
-		document.getElementById(currentlyOpen).remove();
-	} catch(error){
-		console.log("No panels open. Nothing to remove...")
-	}*/
 }
 
 function makeExpressionBuilderConsole(){
@@ -103,7 +98,7 @@ function makeExpressionBuilderConsole(){
 
    	var desc = document.createElement("p");
    	desc.innerHTML = "Welcome to the Expression Builder! Please enter eight or fewer comma-separated integers into the left box and a " + 
-   					"single large positive integer (10E4-10E8) into the right box. When you are ready, hit the \"go\" button and wait a few seconds. Your " +
+   					"single large positive integer (10E4-10E8) into the right box. When you are ready, hit the \"Go\" button and wait a few seconds. Your " +
    					"browser will perform an exhaustive depth-first search to form an arithmetic expression, using the numbers in the left box, " + 
    					"which equals the number in the right box. <br><br> I love this example for so many reasons. It is simple, intuitive, and an accurate " +
    					"demonstration of the speed at which computers process information. Moreso, however, the recursive expression generation beautifully " +
@@ -135,13 +130,12 @@ function makeCreditsConsole(){
 					"Professor Sigrun Bodine: For making me a calculus wizard. This site is largely based on the vector section of your mult" +
 					"i class. Also, thank you so much for your letter of recommendation. It means a lot.<br><br>" + 
 
-					"Duncan M: CS extraordinaire and phone-a-friend. He suggested I use web assembly for this project. Never has anyone misplaced more confide" +
-					"nce in another human being. <br><br>" + 
+					"Duncan M: CS extraordinaire and phone-a-friend. He contributed valuable advice and encouragement. <br><br>" + 
 
 					"Google: Here's the obligatory code citation for Google. In the head of this page's HTML, I have a copy-pasted a Google Analyti" +
 					"cs tag to track usage. Those 5ish lines of code are NOT mine. Thanks, Google. <br><br>" +
 
-					"Alex M (Humble Cornell Applicant): I wrote the other 700 lines of code myself using the prior knowledge given to me by the aforementioned people.";
+					"Alex M (Humble Cornell Applicant): I wrote the other 1000 lines of code myself using the prior knowledge given to me by the aforementioned people.";
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
 	credits.appendChild(desc);
@@ -152,33 +146,31 @@ function makeAboutConsole(){
 	about.appendChild(makeTitle("About"));
 	about.id = "about";
 	var desc = document.createElement("p");
-	desc.innerHTML = "\tThere were some parts of this project that were particularly challenging, and some that I have yet to figure out." + 
+	desc.innerHTML = "There were some parts of this project that were particularly challenging, and some that I have yet to figure out." + 
 					" For example, I spent " + italicize("days") + " trying to get div elements to switch from one animation to another. " +
-					"For some reason, there was hardly any documentation online of people trying to accomplish a similar goal, and I am" +
-					" led to believe that it is a very niche dilemma that doesn't occur very often. Regardless, I ended up solving the " +
-					"problem by dropping the animation entirely, changing the element's style, and waiting for the next repaint before " +
-					"assigning it a new animation. It is an ugly solution but it seems to work. <br><br>" +
+					"For some reason, there was hardly any documentation online of people trying to accomplish a similar goal. Regardless, I ended" + 
+					" up solving the problem by dropping the animation entirely, changing the element's style, and waiting for the next repaint before " +
+					"assigning it a new class.<br><br>" +
 
-					"\tAdditionally, while the browser is working on a project demonstration, the blocks can't easily be animating becaus" +
-					"e of how JavaScript doesn't support threading. Instead, I dodged this problem by making the blocks evacuate the sc" +
-					"reen until demonstration is complete. <br><br>" +
+					"Additionally, because multithreading is unsupported in Javascript, the blocks can't be animated while the computer is" +
+					" working on something else (ex: Expression Builder). I dodged this problem by making the blocks evacuate the screen until" + 
+					" the demonstration is complete.<br><br>" +
 
-					"\tThe block animation, as a whole, was possibly the largest challenge. To avoid having to use the repaint strategy, " +
-					"each block follows a predefined path, as opposed to having its path generated in real-time. Essentially, the paths" +
-					" repeat at scheduled intervals, with the repeat point happening off screen. A little smoke and mirrors worked nice" +
-					"ly here. <br><br>" +
+					"The block animation, as a whole, was possibly the largest challenge. To avoid using the repaint strategy, each " +
+					"block follows a predefined path instead of generating its route in real-time. Essentially, the paths repeat at " +
+					"scheduled intervals, with the repeat point happening off-screen. Some smoke and mirrors worked nicely here.<br><br>" +
+					"Originally, the paths would force the blocks to make sharp turns that seemed to defy physics. Once again, this problem" +
+					" was pretty much undocumented&mdash;I had to come up with something on my own. Eventually, I found a procedure for choosing " +
+					"bezier curve control points that make much shallower turns.<br><br>"+
 
-					"\tThe paths themselves originally forced the blocks to make extremely sharp turns which were unpleasent to watch. " +
-					"Once again, this problem was pretty much undocumented and I had to come up with something on my own. I eventuall" +
-					"y found a proceedure for choosing bezier curve control points that make much shallower turns.<br><br>" + 
 
-					"\tFinally, it was necessary to find the angle of an element mid animation for when the user attempts to pick it up. "+
-					"I initially tried solving this geometrically using the element's bounding rectangle and inferring what it's angle " +
-					"must be to fit inside such a shape. Unfortunately, there are always two possible orientations and it was impossible" +
-					" to infer which one was correct from looking only at one frame. Instead, I simply waited for two frames to pass, and calc"+
-					"ulated the inverse tangent of its motion's slope.<br><br>" +
+					"Finally, it was necessary to find the rotation of a block, mid animation, when the user attempts to pick it up. I initially" +
+					" tried solving this geometrically using the blocks's bounding rectangle and inferring what its angle must be to fit inside " +
+					"such a shape. Unfortunately, there are always two acceptable orientations, either of which could be incorrect. My current " +
+					"strategy is to wait for two frames and calculate the inverse tangent of its motion's slope. This strategy works because the " +
+					"block's forward-facing side is always perpendicular to its velocity vector.<br><br>" +
 
-					"\tGoing forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves.";
+					"Going forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves.";
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
 	about.appendChild(desc);

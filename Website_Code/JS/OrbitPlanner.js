@@ -250,7 +250,7 @@ function evacuateAll(rebuild = false){
 		orbiter.style.top = "500px";
 		orbiter.style.left = "500px";
 		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 10)
-		setTimeout(evacuate, 20, id, [rect.left, rect.top], false)
+		setTimeout(evacuate, 20, id, [rect.left, rect.top], rebuild)
 	}
 	//setTimeout(() => {document.getElementById("bodies").appendChild(bloops)}, evacuateTime * 2000);
 }

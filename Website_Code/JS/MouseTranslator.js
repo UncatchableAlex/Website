@@ -2,10 +2,12 @@ var diagonalLength = Math.sqrt(2) * blockWidth;
 var orbiter;
 var offsetLeft;
 var offsetTop;
-var center = [(window.innerWidth - blockWidth) / 2, (window.innerHeight - blockHeight) / 2];
 var origDist;
 var origAngle;
+var center;
+var windowResize = -1;
 function receiveMouseDown(e){
+	center = [(window.innerWidth - blockWidth) / 2, (window.innerHeight - blockHeight) / 2];
 	orbiter = e.path[0];
 	var firstRect = orbiter.getBoundingClientRect();
 	var firstPoint = [(firstRect.left + firstRect.right) / 2, (firstRect.top + firstRect.bottom)  / 2];
@@ -18,7 +20,7 @@ function receiveMouseDown(e){
 					() =>{
 						var secondRect = orbiter.getBoundingClientRect()
 						var secondPoint = [(secondRect.left + secondRect.right) / 2, (secondRect.top + secondRect.bottom) / 2];
-						console.log(secondRect);
+						//console.log(secondRect);
 						var vec = [secondPoint[0] - firstPoint[0], secondPoint[1] - firstPoint[1]];
 						origAngle = Math.atan(vec[1]/vec[0]);
 						orbiter.style.top = e.clientY - offsetTop;
@@ -29,8 +31,7 @@ function receiveMouseDown(e){
 						receiveMouseMove(e);
 						window.addEventListener("mousemove", receiveMouseMove);
 						window.addEventListener("mouseup", receiveMouseUp);
-						console.log(orbiter.getBoundingClientRect())
-						//origAngle += (Math.PI / 2)
+						//console.log(orbiter.getBoundingClientRect())
 					}
 				);	
 			}
@@ -43,7 +44,7 @@ function receiveMouseMove(e){
 	orbiter.style.left = newPos[0] + "px";
 	var distToCenter = getDist(center, newPos);
 	var newAngle = (origAngle / origDist) * distToCenter;
-	console.log(distToCenter);
+	//console.log(distToCenter);
 	orbiter.style.transform = "rotate(" + newAngle + "rad)";
 } 
 
@@ -71,6 +72,11 @@ function receiveMouseUp(e){
 function getBlockAngle(width, rad = true){
 	 var rads = (Math.PI/4) - Math.acos(width / diagonalLength);
 	 return rads * (180 / Math.PI)
+}
+
+function windowResizeDone(){
+	clearTimeout(windowResize);
+	windowResize = setTimeout(evacuateAll, 500, true);
 }
 
 
