@@ -47,8 +47,11 @@ function killBloop(id){
 
 
 function makeBloop(id){
-	bloopNum = (bloopNum < 2000000) ? ++bloopNum : 0;
 	var node = document.getElementById(id);
+	if(node == null){
+		return;
+	}
+	bloopNum = (bloopNum < 2000000) ? ++bloopNum : 0;
 	var rect = node.getBoundingClientRect();
 	var left = (rect.left + rect.right) >> 1;
 	var top = (rect.top + rect.bottom) >> 1;
@@ -249,8 +252,8 @@ function evacuateAll(){
 		orbiter.setAttribute("class", "runner")
 		orbiter.style.top = "500px";
 		orbiter.style.left = "500px";
-		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 10)
-		setTimeout(evacuate, 20, id, [rect.left, rect.top])
+		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 50)
+		setTimeout(evacuate, 70, id, [rect.left, rect.top])
 	}
 }
 

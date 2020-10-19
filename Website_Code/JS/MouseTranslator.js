@@ -81,7 +81,7 @@ function windowResizeDone(){
 	windowResize = setTimeout( 
 		()=> {
 			evacuateAll();
-			setTimeout(makeOrbiters, evacuateTime);
+			setTimeout(()=>{location.reload();}, 2000);
 		}, 500);
 }
 

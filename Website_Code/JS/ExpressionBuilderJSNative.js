@@ -13,7 +13,7 @@ function runExpressionBuilder(params, target){
     } else if(target.length == 0){
         message = "Target field empty";
     } else if(/[^\d ,]/.test(params)){
-        message = "Incorrect formatting in the params field. Comma separated intergers only, please.";
+        message = "Incorrect formatting in the params field.";
     }
     target = parseInt(target);
     params = params.replace(" ", "").split(",");

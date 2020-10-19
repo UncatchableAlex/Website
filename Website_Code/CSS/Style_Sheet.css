@@ -37,11 +37,14 @@
 				user-select: none;
 			}
 			input{
-				 background: transparent;
-				  border: 0;
-				  font-size: 1.2vw;
-				  outline: none;
-				  position: absolute;
+				position: absolute;
+				background: transparent;
+				border: 0;
+				font-size: 1.2vw;
+				width: 80%;
+				outline: none;
+				position: absolute;
+				text-align: center;
 			}
 			p{
 				position: absolute;
@@ -55,6 +58,7 @@
 				margin: auto;
 				border: none;
 				padding: 1% 5%;
+				width: 15%;
 				text-align: center;
 				display: inline-block;
 			}
@@ -63,6 +67,14 @@
 				background: lightskyblue;
 				width: 30%;
 				min-height: 20%;
+			}
+			.blackBar{
+				position: absolute;
+				background: black;
+				height: 5%;
+				width: 80%;
+				bottom: 5%;
+				left: 10%;
 			}
 			.console{
 				position: absolute;;
