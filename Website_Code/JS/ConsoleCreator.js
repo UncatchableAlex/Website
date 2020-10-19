@@ -94,9 +94,7 @@ function makeCreditsConsole(){
 	credits.appendChild(makeTitle("Credits"));
 	credits.id = "credits";
 	var desc = document.createElement("p");
-	desc.innerHTML = "Believe it or not, this was my first actual attempt at making a website. There were ups and downs, but for the most part, " +
-					"things went pretty well and I am proud to now own a (very) small piece of the internet. It wouldn't have been possible, however, without help from the following " +
-          "people. Huge shout-outs go to: <br><br>" +
+	desc.innerHTML = "This website would not have been possible without help from the following people. Huge shout-outs go to: <br><br>" +
 
 					"Professor David Chiu: For teaching me to care less about if things work, and more about " + italicize("why") + " they work the way they do. Also, " +
 					"of course, for a clutch professor recommendation. Thank you. <br><br>" + 
@@ -138,7 +136,7 @@ function makeAboutConsole(){
 					" tried solving this geometrically using the blocks's bounding rectangle and inferring what its angle must be to fit inside " +
 					"such a shape. Unfortunately, there are always two acceptable orientations, either of which could be incorrect. My current " +
 					"strategy is to wait for two frames and calculate the inverse tangent of its motion's slope. This strategy works because the " +
-					"block's forward-facing side is always perpendicular to its velocity vector.<br><br>" +
+					"block's forward-facing side is always perpendicular to its velocity.<br><br>" +
 
 					"Going forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves.";
 	desc.style.top = "16%";
