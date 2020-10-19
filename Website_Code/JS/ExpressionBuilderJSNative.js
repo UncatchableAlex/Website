@@ -1,49 +1,58 @@
-var closest = Number.MAX_VALUE;
+var closest;
 var ops = ["+", "-", "*", "/"];
 
 function runExpressionBuilder(params, target){
     closest = Number.MAX_VALUE;
-    var target = parseInt(target.replace(" ", ""));
-    var errorMessage = "Error: Incorrect formatting in target field. Please try again";
-    if(isNaN(target)){
-            throw errorMessage;
-    } else if(target < 0){
-        throw "target must be greater than zero";
-    }
-    var params = params.replace(" ", "").split(",");
-    var nums = new Array();
-    for(var i = 0; i < params.length; i++){
-        var num = parseInt(params[i]);
-        if(isNaN(num) || params.length == 0 || params[i].includes(".")){
-            throw errorMessage;
-        }
-        nums.push(num);
-     }
-    var newDiv = document.createElement("div")
-    if(document.getElementById("answer") != null){
+    var message;
+     if(document.getElementById("answer") != null){
         document.getElementById("answer").remove();
     }
+
+    if(/\D/.test(target)){
+         message = "Incorrect formatting in target field. Please try again.";
+    } else if(target.length == 0){
+        message = "Target field empty";
+    } else if(/[^\d ,]/.test(params)){
+        message = "Incorrect formatting in the params field. Comma separated intergers only, please.";
+    }
+    target = parseInt(target);
+    params = params.replace(" ", "").split(",");
+    if(params.length > 7 && message == null){
+        ui = confirm("You have entered " + params.length + " numbers. Be aware " +
+            "that this may cause the tab to freeze for a long period or crash. " +
+            "Press 'OK' to continue, or 'Cancel' to abort");
+        if(!ui){
+            message = "Enter fewer numbers this time!     :)";
+        }
+    }
+    if(target < 0 && message == null){
+        message = "Target must be greater than zero.";
+    }
+    if(params.length == 1 && params[0] == target){
+        message = params[0] + " = " + target;
+    }
+    var nums = new Array();
+    params.forEach(num => nums.push(parseInt(num)));
+    var newDiv = document.createElement("div")
+    newDiv.id = "answer";
+    if(message != null){
+        newDiv.innerHTML = message;
+        document.getElementById("answerDisplay").appendChild(newDiv);
+        return;
+    }
     document.getElementById("bloops").innerHTML = "";
-    evacuateAll(false);
+    evacuateAll();
     setTimeout(() => {document.getElementById("bloops").innerHTML = "";}, evacuateTime * 800);
     setTimeout(
-        () => {
-            document.getElementById("bloops").innerHTML = "";
-            newDiv.innerHTML = buildExpression(nums, target);
-            newDiv.id = "answer";
-            document.getElementById("answerDisplay").appendChild(newDiv);
-            makeOrbiters();
-        }, evacuateTime * 1000);
+            () => {
+                document.getElementById("bloops").innerHTML = "";
+                newDiv.innerHTML = buildExpression(nums, target);
+                document.getElementById("answerDisplay").appendChild(newDiv);
+                makeOrbiters();
+            }, evacuateTime * 1000);
 }
 
 function buildExpression(list, target){
-    if(list.length > 7){
-        ui = confirm("You have entered " + list.length + 
-            " numbers. Beware that this may cause the tab to freeze for a long period or crash. Press 'OK' to continue, or 'Cancel' to abort");
-        if(!ui){
-            return "Enter fewer numbers this time!     :)";
-        }
-    }
     var res = buildExpressionHelper(list, target);
     return res == null ? " No solution found. Try " + closest + " as a target instead. " : res.slice(1, res.length - 1) + " = " + target; 
 }
@@ -121,6 +130,7 @@ function getRes(list, target, i, j, op){
 }
 
 function expandExpression(first, second, curr, op, numToReplace){
+    // I recognize that I could have done this with a regular expression. I'm not comfortable enough with them yet. I will change it at some point.
     var strNtr = numToReplace.toString();
     var insertExp = "(" + first + " " + op + " " + second + ")";
     for(var i = strNtr.length; i <= curr.length; i++){
