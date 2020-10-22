@@ -49,7 +49,7 @@ function runExpressionBuilder(params, target){
                 newDiv.innerHTML = buildExpression(nums, target);
                 document.getElementById("answerDisplay").appendChild(newDiv);
                 makeOrbiters();
-            }, evacuateTime * 1000);
+            }, evacuateTime * 1500);
 }
 
 function buildExpression(list, target){

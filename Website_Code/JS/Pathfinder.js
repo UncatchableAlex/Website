@@ -1,17 +1,14 @@
 var canvasBin;
-var userRGBA = [0,0,0,255];
-var userThickness = 3;
-var pathRGBA = [255, 0, 0, 255];
-var pathThickness = 1;
-var borderRGBA = [216,191,216, 255];
-var borderThickness = 1;
+var userRGBA = [0,0,0,255]; // black
+var userThickness;
+var pathRGBA = [255, 0, 0, 255]; // red
+var pathThickness;
 var safeSpace = 40;
 var prevCanX, prevCanY;
 var canvas;
 var pathlessData;
 var lowerBoundY, upperBoundY, leftBoundX, rightBoundX;
 var borderDrawn = false;
-var borderBuffer = 3;
 var ctx;
 
 function makeCanvasBin(canvas){
@@ -54,6 +51,7 @@ function drawShortestPath(){
 }
 
 function updateCanvas(e){
+	console.log("updating canvas");
 	canvas = document.getElementById("pfcanvas");
 	var rect = canvas.getBoundingClientRect();
 	imageData = pathlessData;
@@ -78,6 +76,7 @@ function updateCanvas(e){
 }
 
 function drawDot(imageData, pixX, pixY, rgba, radius, type = "user"){
+	console.log("drawing dot");
 	if(type == "user" && (getDist([pixX, pixY], [leftBoundX, upperBoundY]) < safeSpace || getDist([pixX, pixY], [rightBoundX, lowerBoundY]) < safeSpace)){
 		return;
 	}
@@ -95,17 +94,11 @@ function drawDot(imageData, pixX, pixY, rgba, radius, type = "user"){
 				}
 				var pix = ((pixY + j) * canvas.width) + pixX + i;
 				pix *= 4;
-				var isBorderCell = true;
 				for(var k = 0; k < 4; k++){
-					isBorderCell = imageData.data[pix + k] != borderRGBA[k] ? false : isBorderCell;
-				}	
-				if(!isBorderCell){
-					for(var k = 0; k < 4; k++){
-						imageData.data[pix + k] = rgba[k];
-						if(type != "path"){
-							pathlessData.data[pix + k] = rgba[k];
-						}
-					}	
+					imageData.data[pix + k] = rgba[k];
+					if(type != "path"){
+						pathlessData.data[pix + k] = rgba[k];
+					}
 				}
 			}
 		}
@@ -116,16 +109,9 @@ function initialize(){
 	ctx = canvas.getContext("2d");
 	imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 	pathlessData = ctx.createImageData(imageData);
+	pathThickness = canvas.width * 0.002;
+	userThickness = canvas.width * 0.006;
 	makeCanvasBin();
-	for(var i = leftBoundX - borderBuffer; i <= rightBoundX + borderBuffer; i += Math.max(1, borderThickness / 2)){
-		drawDot(imageData, i, upperBoundY - borderBuffer, borderRGBA, borderThickness, "border");
-		drawDot(imageData, i, lowerBoundY + borderBuffer, borderRGBA, borderThickness, "border");
-	}
-	for(var i = upperBoundY - borderBuffer; i <= lowerBoundY + borderBuffer; i += Math.max(1, borderThickness / 2)){
-		drawDot(imageData, leftBoundX - borderBuffer, i, borderRGBA, borderThickness, "border");
-		drawDot(imageData, rightBoundX + borderBuffer, i, borderRGBA, borderThickness, "border");
-	}
-	ctx.putImageData(imageData, 0, 0)
 }
 
 function getPathArr(node){

@@ -4,7 +4,7 @@ var bloopTimeout = 2000;
 var bloopRefresh = 80;
 var blockWidth = 150;
 var blockHeight = 150;
-var evacuateTime = 0.3;
+var evacuateTime = 0.6;
 var secsPerSegment = 5;
 //how smooth the curves transitions are guarenteed to be. Higher number is smoother. Choose number between 0 and pi/2:
 var smoothness = Math.PI/6;
@@ -245,6 +245,21 @@ function getOffScreenPoint(){
 	}
 }
 
+function getFurthestOffScreenPoint(currPoint){
+	var midPoint = [window.innerWidth / 2, window.innerHeight / 2];
+	if((currPoint[0] < midPoint[0]) && (currPoint[1] < midPoint[1])){
+		return [window.innerWidth + 200, window.innerHeight + 200];
+	} 
+	else if((currPoint[0] < midPoint[0]) && (currPoint[1] > midPoint[1])){
+		return [window.innerWidth + 200, - 200];
+	} 
+	else if((currPoint[0] > midPoint[0]) && (currPoint[1] > midPoint[1])){
+		return [-200, -200];
+	} 
+	return 	[-200, window.innerHeight + 200]
+}
+	
+
 function evacuateAll(){
 	for(let id of ids.keys()){
 		var orbiter = document.getElementById(id);
@@ -263,18 +278,17 @@ function evacuate(id, dropInPoint){
 	for(var i = 0; i < orbiter.classList.length; i++){
 		orbiter.classList.remove(orbiter.classList[i]);
 	}
-	cmd = getRunStyle(dropInPoint, ids.get(id));
-	orbiter.setAttribute("style", cmd);
+	orbiter.style = getRunStyle(dropInPoint, ids.get(id));
 	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
 }
 
 function getRunStyle(dropInPoint, color){
-	var endPoint = getOffScreenPoint();
+	var endPoint = getFurthestOffScreenPoint(dropInPoint);
 	var firstCtrl = getFirstCtrlPoint(getRandomPoint(dropInPoint), dropInPoint);
 	var secondCtrl = getSecondCtrlPoint(dropInPoint, firstCtrl, endPoint);
 	var cmd = "background: " + color + "; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
 				"top:0px; left: 0px; z-index: 1; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 				firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
-				"'); offset-distance: 0%; animation: orbit; animation: orbit " + evacuateTime + "s linear; animation-fill-mode: forwards;";
+				"'); offset-distance: 0%; animation: orbit " + evacuateTime + "s linear; animation-fill-mode: forwards;";
 	return cmd;
 }

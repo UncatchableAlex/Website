@@ -10,6 +10,9 @@ var remakeOrbiters = -1;
 function receiveMouseDown(e){
 	center = [(window.innerWidth - blockWidth) / 2, (window.innerHeight - blockHeight) / 2];
 	orbiter = e.path[0];
+	if(!Array.from(ids.keys()).includes(orbiter.getAttribute("class"))){
+		return;
+	}
 	var firstRect = orbiter.getBoundingClientRect();
 	var firstPoint = [(firstRect.left + firstRect.right) / 2, (firstRect.top + firstRect.bottom)  / 2];
 	offsetLeft = e.clientX - firstRect.left;
@@ -18,7 +21,7 @@ function receiveMouseDown(e){
 	window.requestAnimationFrame(
 		() => {
 				window.requestAnimationFrame(
-					() =>{
+					() => {
 						var secondRect = orbiter.getBoundingClientRect()
 						var secondPoint = [(secondRect.left + secondRect.right) / 2, (secondRect.top + secondRect.bottom) / 2];
 						//console.log(secondRect);

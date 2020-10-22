@@ -42,12 +42,16 @@ function receiveBgroundClick(){
 function makeExpressionBuilderConsole(){
 	var expBuild = makeGenericConsoleTemplate("exBuild");
 
-    expBuild.appendChild(makeTitle("Expression Builder"));
+  var container = document.createElement("container");
+  container.setAttribute("class", "textContainer");
+  container.style = "display: flex; flex-wrap: wrap; align-content: flex-start;width: 100%; left: 0%;";
+  container.appendChild(makeTitle("Expression Builder"));
+  expBuild.appendChild(container);
 
     var div1 = document.createElement("div")
    	div1.style = "height: 20%; width: 60%; position: relative;";
     div1.id = "div1";
-    expBuild.appendChild(div1);
+    container.appendChild(div1);
 
     var blackBar1 = document.createElement("div")
     blackBar1.setAttribute("class", "blackBar");
@@ -64,7 +68,7 @@ function makeExpressionBuilderConsole(){
    	var div2 = document.createElement("div");
    	div2.style = "width: 40%; height: 20%; position: relative";
     div2.id = "div2";
-    expBuild.appendChild(div2);
+    container.appendChild(div2);
 
     var blackBar2 = document.createElement("div")
     blackBar2.setAttribute("class", "blackBar");
@@ -83,12 +87,12 @@ function makeExpressionBuilderConsole(){
    	goButton.style = "top: 41%; left: 45%; background-color: #e4e1ff;";
    	goButton.innerHTML = "GO!";
    	goButton.onclick = () => {runExpressionBuilder(input1.value, input2.value)};
-   	expBuild.append(goButton);
+   	container.append(goButton);
 
    	var answerDisplay = document.createElement("div");
    	answerDisplay.id = "answerDisplay";
    	answerDisplay.setAttribute("class", "answerDisplay");
-   	expBuild.appendChild(answerDisplay);
+   	container.appendChild(answerDisplay);
 
    	var desc = document.createElement("p");
    	desc.innerHTML = "Welcome to the Expression Builder! Please enter seven or fewer comma-separated integers into the left box and a " + 
@@ -103,13 +107,16 @@ function makeExpressionBuilderConsole(){
 
    	desc.style.top = "50%";
    	desc.style.height = "35%";
-   	expBuild.appendChild(desc);
+   	container.appendChild(desc);
 }
 
 function makeCreditsConsole(){
 	credits = makeGenericConsoleTemplate("credits");
-	credits.appendChild(makeTitle("Credits"));
 	credits.id = "credits";
+  var textContainer = document.createElement("container");
+  textContainer.setAttribute("class", "textContainer");
+  textContainer.style = "width: 100%; left: 0%;";
+  credits.appendChild(textContainer);
 	var desc = document.createElement("p");
 	desc.innerHTML = "This website would not have been possible without help from the following people. Huge shout-outs go to: <br><br>" +
 
@@ -117,16 +124,23 @@ function makeCreditsConsole(){
 					"of course, for a clutch professor recommendation. Thank you. <br><br>" + 
 
 					"Professor Sigrun Bodine: For being an awesome calculus mentor. Thank you so much for your fantastic instruction and letter of recommendation.<br><br>";
-
+  desc.style = "overflow: hidden";
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
-	credits.appendChild(desc);
+  textContainer.appendChild(makeTitle("Credits"));
+  textContainer.appendChild(desc);
 }
 
 function makeAboutConsole(){
-	about = makeGenericConsoleTemplate("about")
-	about.appendChild(makeTitle("About"));
-	about.id = "about";
+	var about = makeGenericConsoleTemplate("about")
+  about.id = "about";
+
+  var textContainer = document.createElement("container");
+  textContainer.setAttribute("class", "textContainer");
+  textContainer.style = "width: 100%; left: 0%;";
+  textContainer.appendChild(makeTitle("About"));
+  about.appendChild(textContainer);
+
 	var desc = document.createElement("p");
 	desc.innerHTML = "There were some parts of this project that were particularly challenging, and some that I have yet to figure out." + 
 					" For example, I spent " + italicize("days") + " trying to get div elements to switch from one animation to another. " +
@@ -155,47 +169,72 @@ function makeAboutConsole(){
 					"Going forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves.";
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
-	about.appendChild(desc);
+	textContainer.appendChild(desc);
 }
 
 function makePathFinderConsole(){
-  evacuateAll(false);
-  evacuated = true;
   var pf = makeGenericConsoleTemplate("pathfinder");
   pf.style.width = "60%";
   pf.style.left = "17.5%";
+
+  var canvasContainer = document.createElement("container");
+  var leftBar = document.createElement("div");
+  leftBar.style = "position: absolute; top: 5%; height: 91%; left: 3%; width: 0.6%; background-color: thistle; z-index: 200000;";
+  var rightBar = document.createElement("div");
+  rightBar.style = "position: absolute; top: 5%; height: 91%; left: 67%; width: 0.6%; background-color: thistle; z-index: 200000;";
+  var topBar = document.createElement("div");
+  topBar.style = "position: absolute; top: 4%; height: 0.6vh; left: 3%; width: 64.6%; background-color: thistle; z-index: 200000";
+  var bottomBar = document.createElement("div");
+  bottomBar.style = "position: absolute; bottom: 3%; height: 0.6vh; left: 3%; width: 64.6%; background-color: thistle; z-index: 200000";
+  canvasContainer.appendChild(leftBar);
+  canvasContainer.appendChild(rightBar);
+  canvasContainer.appendChild(topBar);
+  canvasContainer.appendChild(bottomBar);
+  canvasContainer.setAttribute("style", "z-index: 2000000;");
+  pf.appendChild(canvasContainer);
+
   var canvas = document.createElement("canvas");
   canvas.id = "pfcanvas";
-  pf.appendChild(canvas);
-  canvas.width = 500;
-  canvas.height = 250;
-  canvas.addEventListener("mousedown", () => {mousedown = true;});
-  canvas.addEventListener("mouseup", () => {mousedown = false; drawShortestPath();});
-  canvas.addEventListener("mousemove", (e) => {if(mousedown) updateCanvas(e);});
-  initialize();
-  var title = makeTitle("Build... Amaze");
-  pf.appendChild(title);
+  canvasContainer.appendChild(canvas);
+  canvas.style.left = "0%";
+  canvas.width = 1000;
+  canvas.height = 500;
+  canvas.addEventListener("mousedown", (e) => {mousedown = true; console.log(e.type)});
+  canvas.addEventListener("mouseup", (e) => {mousedown = false; drawShortestPath(); console.log(e.type);});
+  canvas.addEventListener("mousemove", (e) => {if(mousedown) updateCanvas(e); console.log(e.type);});
+
+  var textContainer = document.createElement("container");
+  textContainer.setAttribute("class", "textContainer");
+  textContainer.style = "width: 30%; right: 0%;";
+
+  var title = makeTitle("Be Amazed!");
+  title.setAttribute("style","z-index: 10;");
   title.style.top = "5%";
-  title.style.left = "34%";
-  title.style.width = "50%";
-  title.setAttribute("position", "absolute");
+  title.style.left = "0%";
+  title.setAttribute("position", "relative");
+  textContainer.appendChild(title);
+
   desc = document.createElement("p")
   desc.innerHTML = "Instructions: Drag your mouse over the left-side canvas to construct the walls of your maze. The computer will attempt to find a " +
                   " passage from the top left to the bottom right. If it is unable, it will give up and the game is over. <br><br>" + 
-                  "Description: Perhaps by now you have seen the \"depth-first \" exhibit and the stunning precision that it can achieve. Often overlooked, however,"+
+                  "Description: Perhaps by now you have seen the \"depth-first\" exhibit and the stunning precision that it can achieve. Often overlooked, however,"+
                   " is its sister searching algorithm: the \"breadth-first\" search. Neither algorithm is better in all cases, and a lot of the time, deciding "+
                   "between them can be a challenge. If depth-first searching is like lightning, always looking for an expansion node furthest away from its source, " +
                   "then breadth-first searching is more like an oil spill, stretching outward in all directions evenly until finding its target. In this case, the " +
-                  "media that is being flooded is a two dimensional plane with the size and resolution of the canvas displayed on-screen (the origin of the spill being the top left). The first edge of the " +
+                  "medium that is being flooded is a two dimensional plane with the size and resolution of the canvas displayed on-screen (the origin of the spill being the top left). The first edge of the " +
                   "metaphorical spilled oil that touches the target destination (bottom right) will be traced back to its source and marked in red. This algorithm goes much faster than the " +
                   "depth-first search because there are only MxN nodes to evaluate (the number of pixels on the canvas) as opposed to the billions of permutations that the depth-first search must account for."
 desc.style = "padding: 1% 1% 1% 1%";
-desc.style.width = "25%";
-desc.style.left = "72%"
+desc.style.width = "90%";
+desc.style.left = "5%"
 desc.style.top = "17%"
-desc.style.height = "75%";
-//desc.setAttribute("text-align", "right");
-pf.appendChild(desc)
+desc.style.height = "80%";
+textContainer.appendChild(desc)
+
+pf.appendChild(textContainer);
+evacuateAll(false);
+evacuated = true;
+initialize();
 }
 
 function makeBlackConsole(){
