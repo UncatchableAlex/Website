@@ -7,7 +7,7 @@ var borders = new Map(
       ["blank", "hotpink"], 
       ["credits", "powderblue"], 
       ["about", "lightgoldenrodyellow"], 
-      ["pathfinder", "lavender"]
+      ["pathfinder", "#FFC6C6"]
   ]
 );
 function makeConsole(id){
@@ -35,6 +35,7 @@ function receiveBgroundClick(){
 	consoles.forEach(console => console.remove());
   if(evacuated){
     makeOrbiters();
+    evacuated = false;
   }
 }
 
