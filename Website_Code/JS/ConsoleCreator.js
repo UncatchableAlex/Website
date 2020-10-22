@@ -1,5 +1,15 @@
 var currentlyOpen;
-var borders = new Map([["exBuild", "mistyrose"], ["blank", "hotpink"], ["credits", "powderblue"], ["about", "lightgoldenrodyellow"]]);
+var mousedown = false;
+var evacuated = false;
+var borders = new Map(
+  [
+      ["exBuild", "mistyrose"], 
+      ["blank", "hotpink"], 
+      ["credits", "powderblue"], 
+      ["about", "lightgoldenrodyellow"], 
+      ["pathfinder", "lavender"]
+  ]
+);
 function makeConsole(id){
 	switch(id){
 		case("expBuild"): 
@@ -11,6 +21,9 @@ function makeConsole(id){
 		case("about"):
 			makeAboutConsole();
 			break;
+    case("amaze"):
+      makePathFinderConsole();
+      break;
 		default:
 			makeBlackConsole();
 			break;
@@ -20,6 +33,9 @@ function makeConsole(id){
 function receiveBgroundClick(){
 	var consoles = document.querySelectorAll(".console")
 	consoles.forEach(console => console.remove());
+  if(evacuated){
+    makeOrbiters();
+  }
 }
 
 function makeExpressionBuilderConsole(){
@@ -80,7 +96,7 @@ function makeExpressionBuilderConsole(){
    					"which equals the number in the right box. <br><br> I love this example for so many reasons. It is simple, intuitive, and an accurate " +
    					"demonstration of the speed at which computers process information. Moreso, however, the recursive expression generation beautifully " +
    					"exemplifies the nature of exponential growth. Try using only " +
-   					"three or four numbers on the left side. It processes instantly, right? Now try eight numbers on the left side and a different " +
+   					"three or four numbers on the left side. It processes instantly, right? Now try entering seven numbers on the left side and a different " +
    					"larger number on the right. It's going to take quite a while because even though you only entered a few more numbers, " +
    					"the computer must process billions more permutations. How long do you think it would take with nine numbers? Or ten?"
 
@@ -99,10 +115,7 @@ function makeCreditsConsole(){
 					"Professor David Chiu: For teaching me to care less about if things work, and more about " + italicize("why") + " they work the way they do. Also, " +
 					"of course, for a clutch professor recommendation. Thank you. <br><br>" + 
 
-					"Professor Sigrun Bodine: For being an awesome calculus instructor. Thank you so much for your fantastic instruction and letter of recommendation.<br><br>" 
-
-         /* + "Mozilla Developer Network: For providing useful examples to difficult questions." + 
-          " They are, essentially, a comprehensive almanac for everything web development related.";*/
+					"Professor Sigrun Bodine: For being an awesome calculus mentor. Thank you so much for your fantastic instruction and letter of recommendation.<br><br>";
 
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
@@ -127,8 +140,8 @@ function makeAboutConsole(){
 					"The block animation, as a whole, was possibly the largest challenge. To avoid using the repaint strategy, each " +
 					"block follows a predefined path instead of generating its route in real-time. Essentially, the paths repeat at " +
 					"scheduled intervals, with the repeat point happening off-screen. Some smoke and mirrors worked nicely here.<br><br>" +
-					"Originally, the paths would force the blocks to make sharp turns that seemed to defy physics. Once again, this problem" +
-					" was pretty much undocumented&mdash;I had to come up with something on my own. Eventually, I found a procedure for choosing " +
+					"Originally, the paths would force the blocks to make sharp turns which seemed to defy physics. Once again, this problem" +
+					" was pretty much undocumented&mdash;I had to come up with something on my own. Eventually, I discovered a procedure for choosing " +
 					"bezier curve control points that make much shallower turns.<br><br>"+
 
 
@@ -142,6 +155,46 @@ function makeAboutConsole(){
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
 	about.appendChild(desc);
+}
+
+function makePathFinderConsole(){
+  evacuateAll(false);
+  evacuated = true;
+  var pf = makeGenericConsoleTemplate("pathfinder");
+  pf.style.width = "60%";
+  pf.style.left = "17.5%";
+  var canvas = document.createElement("canvas");
+  canvas.id = "pfcanvas";
+  pf.appendChild(canvas);
+  canvas.width = 500;
+  canvas.height = 250;
+  canvas.addEventListener("mousedown", () => {mousedown = true;});
+  canvas.addEventListener("mouseup", () => {mousedown = false; drawShortestPath();});
+  canvas.addEventListener("mousemove", (e) => {if(mousedown) updateCanvas(e);});
+  initialize();
+  var title = makeTitle("Build... Amaze");
+  pf.appendChild(title);
+  title.style.top = "5%";
+  title.style.left = "34%";
+  title.style.width = "50%";
+  title.setAttribute("position", "absolute");
+  desc = document.createElement("p")
+  desc.innerHTML = "Instructions: Drag your mouse over the left-side canvas to construct the walls of your maze. The computer will attempt to find a " +
+                  " passage from the top left to the bottom right. If it is unable, it will give up and the game is over. <br><br>" + 
+                  "Description: Perhaps by now you have seen the \"depth-first \" exhibit and the stunning precision that it can achieve. Often overlooked, however,"+
+                  " is its sister searching algorithm: the \"breadth-first\" search. Neither algorithm is better in all cases, and a lot of the time, deciding "+
+                  "between them can be a challenge. If depth-first searching is like lightning, always looking for an expansion node furthest away from its source, " +
+                  "then breadth-first searching is more like an oil spill, stretching outward in all directions evenly until finding its target. In this case, the " +
+                  "media that is being flooded is a two dimensional plane with the size and resolution of the canvas displayed on-screen (the origin of the spill being the top left). The first edge of the " +
+                  "metaphorical spilled oil that touches the target destination (bottom right) will be traced back to its source and marked in red. This algorithm goes much faster than the " +
+                  "depth-first search because there are only MxN nodes to evaluate (the number of pixels on the canvas) as opposed to the billions of permutations that the depth-first search must account for."
+desc.style = "padding: 1% 1% 1% 1%";
+desc.style.width = "25%";
+desc.style.left = "72%"
+desc.style.top = "17%"
+desc.style.height = "75%";
+//desc.setAttribute("text-align", "right");
+pf.appendChild(desc)
 }
 
 function makeBlackConsole(){

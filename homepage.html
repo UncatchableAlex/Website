@@ -7,21 +7,15 @@
 		<script src = Website_Code/JS/MouseTranslator.js></script>
 		<script src = Website_Code/JS/ExpressionBuilderJSNative.js></script>
 		<script src = Website_Code/JS/ConsoleCreator.js></script>
+		<script src = Website_Code/JS/Pathfinder.js></script>
 
-		<!-- Global site tag (gtag.js) - Google Analytics -->
-		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-180653985-1"></script>
-		<script>
-		  window.dataLayer = window.dataLayer || [];
-		  function gtag(){dataLayer.push(arguments);}
-		  gtag('js', new Date());
-
-		  gtag('config', 'UA-180653985-1');
-		</script>
 		<script>
 			function onloadSeq(){
+				localStorage.clear();
 				makeOrbiters();
 				document.getElementById("background").addEventListener("click", receiveBgroundClick);
 				window.addEventListener("resize", windowResizeDone);
+				makePathFinderConsole();
 				//makeExpressionBuilderConsole();
 			}
 		</script>

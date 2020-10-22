@@ -1,5 +1,5 @@
 var bloopNum;
-var ids = new Map([["expBuild", "salmon"], ["credits","aqua"], ["about", "gold"], ["d","red"], ["e","red"]]);
+var ids = new Map([["expBuild", "salmon"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["e","red"]]);
 var bloopTimeout = 2000;
 var bloopRefresh = 80;
 var blockWidth = 150;
@@ -195,7 +195,7 @@ function rotateVector(vec, theta){
 // shorten/lengthen vec to have a magnitude of 1
 function normalizeVector(vec){
 	var mag = getDist(new Array(0,0), vec);
-	return new Array(vec[0] / mag, vec[1] / mag);
+	return mag == 0 ? [0, 0] : [vec[0] / mag, vec[1] / mag];
 }
 
 // make vec point in the opposite direction.

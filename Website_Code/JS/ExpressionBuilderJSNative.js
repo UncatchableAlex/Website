@@ -77,9 +77,13 @@ function buildExpressionHelper(list, target){
 }
 
 function getRes(list, target, i, j, op){
-    var first = list[i], second = list[j], newList = list.slice(0), res;
-    newList.splice(i, 1);
-    newList.splice(j - 1, 1);
+    var first = list[i], second = list[j], res;
+    var newList = new Array();
+    for(var a = 0; a < list.length; a++){
+        if(a != i && a != j){
+            newList.push(list[a]);
+        }
+    }
     switch(op){
         case "+": 
             newList.push(first + second);
