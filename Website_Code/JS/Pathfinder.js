@@ -67,8 +67,8 @@ function updateCanvas(e, erase = false){
 	vec = normalizeVector(vec);
 	var distGone = 0;
 	drawDot(imageData, canX << 0, canY << 0, userRGBA, userThickness, erase);
-	while(distGone + (0.5 * userThickness) <= dist){		
-		distGone += userThickness;
+	while(distGone + (0.3 * userThickness) <= dist){		
+		distGone += (0.3 * userThickness);
 		drawDot(imageData, canX + (distGone * vec[0]) << 0, canY + (distGone * vec[1]) << 0, userRGBA, userThickness, erase);
 	}
 	prevCanY = canY;
@@ -127,7 +127,8 @@ function getPathArr(node){
 function getPath(arr){
 	var targetNode = new Node(rightBoundX - 1, lowerBoundY - 1);
 	var currNode = new Node(leftBoundX + 1, upperBoundY + 1);
-	var queue = new Array(currNode);
+	var queue = new Queue();
+	queue.push(currNode);
 	while(queue.length != 0){
 		for(var i = Math.max(currNode.y - 1, upperBoundY); i <= Math.min(currNode.y + 1, lowerBoundY); i++){
 			for(var j = Math.max(currNode.x - 1, leftBoundX); j <= Math.min(currNode.x + 1, rightBoundX); j++){
@@ -141,7 +142,7 @@ function getPath(arr){
 				}
 			}
 		}
-		currNode = queue.shift();
+		currNode = queue.poll();
 	}
 	//printArr(arr);
 	return currNode.x == targetNode.x && currNode.y == targetNode.y ? currNode : null;
