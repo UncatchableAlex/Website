@@ -5,13 +5,14 @@ var bloopRefresh = 80;
 var blockWidth = 150;
 var blockHeight = 150;
 var evacuateTime = 0.6;
-var secsPerSegment = 5;
+var secsPerSegment;
 //how smooth the curves transitions are guarenteed to be. Higher number is smoother. Choose number between 0 and pi/2:
 var smoothness = Math.PI/6;
 var rules = new Array();
 var ss = document.styleSheets[0];
 var intervals = new Map();
 function makeOrbiters(keys = Array.from(ids.keys()), dpoint = null){
+	secsPerSegment = (window.innerWidth / 1707) * 5;
 	// get the document's stylesheet:
 	// for each id:
 	for(var i = 0; i < keys.length; i++){
@@ -72,7 +73,7 @@ function makeRule(id, dropInPoint){
 			}
 		}
 	} else {
-		ids.set(id[0], id[1]);
+		throw "No corresponding ids found in the id map";
 	}
 	// make a point to end at (don't be confused as to the name. It will make sense later):
 	var startPoint = getRandomPoint(dropInPoint);
@@ -83,7 +84,7 @@ function makeRule(id, dropInPoint){
 	// these guys will be used later. Keep them null for now though:
 	var ctrlPoint2, ctrolPoint1, endPoint;
 	// start making a new rule:
-	var rule = "." + id + "{background: " + ids.get(id) + "; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
+	var rule = "." + id + "{cursor: pointer; background: " + ids.get(id) + "; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
 				"top:0px; left: 0px; z-index: 20; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 				firstCtrl[1] + " " + prevCtrl[0] + " " + prevCtrl[1] + " " + startPoint[0] + " " + startPoint[1];
 	// make between 7 and 15 svg bezier curve paths:

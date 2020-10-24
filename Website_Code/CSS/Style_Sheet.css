@@ -13,15 +13,17 @@
 				margin: 0px;
 				overflow: hidden;
 			}
+			h1,h2{
+				font-family: "blippo, fantasy";
+				color: lightslategrey;
+				user-select: none;
+			}
 			h1{
 				top: 10%;
 				text-align: center;
 				font-size: 9vw;
 				font-weight: bold;
 				font-style: italic;
-				font-family: "blippo, fantasy";
-				color: lightslategrey;
-				user-select: none;
 			}
 			h2{
 				position: relative;
@@ -32,9 +34,6 @@
 				margin-top: 0px;
 				margin-bottom: 0px;
 				font-size: 2vw;
-				font-family: "blippo, fantasy";
-				color: lightslategrey;
-				user-select: none;
 			}
 			input{
 				position: absolute;
@@ -52,15 +51,19 @@
 				margin: auto;
 				font-size: 1.3em;
 				overflow: auto;
+				user-select: none;
 			}
 			button{
 				position: absolute;
 				margin: auto;
 				border: none;
-				padding: 1% 5%;
-				width: 15%;
 				text-align: center;
 				display: inline-block;
+				background-color: #e4e1ff;
+				font-family: "blippo, fantasy";
+				color: black;
+				user-select: none;
+				cursor: pointer;
 			}
 			canvas, .textContainer{
 				position: absolute;
@@ -140,25 +143,40 @@
 				height: 10%;
 				width: 90%;
 			}
-			.receptacle{
+			.xout, .receptacle{
 				position: absolute;
 				background: transparent;
+				font-family: Times New Roman, Times, serif;
+				justify-content: center;
+				text-align: center;
+
+			}
+			.xout{
+				top: -4.5vh;
+				left: -2.1vw;
+				height: 4vh;
+				width: 4vh;
+				font-size: 100%;
+				z-index: 3000000;
+				user-select: all;
+				cursor: pointer;
+				color: dimgrey;
+				user-select: none;
+			}
+			.receptacle{
+				z-index: 300;
 				height: 150px;
 				width: 150px;
 				top: 50%;
 				left: 50%;
-				transform: translate(-75px, -75px);
-				border-style: solid;
 				border-width: 5%;
 				border-color: grey;
-				font-family: Times New Roman, Times, serif;
-				line-height: 50px;
-				font-style: italic;
-				font-size: 2.3em;
-				justify-content: center;
+				transform: translate(-75px, -75px);
 				color: lightslategrey;			
-				text-align: center;
-				z-index: 300;
+				border-style: solid;
+				line-height: 50px;
+				font-size: 2.3em;
+				font-style: italic;
 				user-select: none;
 			}
 			@keyframes shrink{

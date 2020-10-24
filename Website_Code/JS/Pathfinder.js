@@ -3,6 +3,7 @@ var userRGBA = [0,0,0,255]; // black
 var userThickness;
 var pathRGBA = [255, 0, 0, 255]; // red
 var pathThickness;
+var eraseRGBA = [0, 0, 0, 0] //white
 var safeSpace = 40;
 var prevCanX, prevCanY;
 var canvas;
@@ -43,15 +44,15 @@ function drawShortestPath(){
 	var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 	var currNode = getPath(copyArray(canvasBin));
 	while(currNode != null){
-		drawDot(imageData, currNode.x, currNode.y, pathRGBA, pathThickness, "path");
+		drawDot(imageData, currNode.x, currNode.y, pathRGBA, pathThickness, false, "path");
 		currNode = currNode.parent;
 	}
 	ctx.putImageData(imageData, 0, 0);
 	prevCanX = prevCanY = null;
 }
 
-function updateCanvas(e){
-	console.log("updating canvas");
+function updateCanvas(e, erase = false){
+	//console.log("updating canvas");
 	canvas = document.getElementById("pfcanvas");
 	var rect = canvas.getBoundingClientRect();
 	imageData = pathlessData;
@@ -65,18 +66,18 @@ function updateCanvas(e){
 	var dist = getDist([0,0], vec);
 	vec = normalizeVector(vec);
 	var distGone = 0;
-	drawDot(imageData, canX << 0, canY << 0, userRGBA, userThickness);
+	drawDot(imageData, canX << 0, canY << 0, userRGBA, userThickness, erase);
 	while(distGone + (0.5 * userThickness) <= dist){		
 		distGone += userThickness;
-		drawDot(imageData, canX + (distGone * vec[0]) << 0, canY + (distGone * vec[1]) << 0, userRGBA, userThickness);
+		drawDot(imageData, canX + (distGone * vec[0]) << 0, canY + (distGone * vec[1]) << 0, userRGBA, userThickness, erase);
 	}
 	prevCanY = canY;
 	prevCanX = canX;
 	ctx.putImageData(imageData, 0, 0);
 }
 
-function drawDot(imageData, pixX, pixY, rgba, radius, type = "user"){
-	console.log("drawing dot");
+function drawDot(imageData, pixX, pixY, rgba, radius, erase = false, type = "user"){
+	//console.log("drawing dot");
 	if(type == "user" && (getDist([pixX, pixY], [leftBoundX, upperBoundY]) < safeSpace || getDist([pixX, pixY], [rightBoundX, lowerBoundY]) < safeSpace)){
 		return;
 	}
@@ -90,14 +91,14 @@ function drawDot(imageData, pixX, pixY, rgba, radius, type = "user"){
 					continue;
 				}
 				if(type == "user"){
-					canvasBin[pixY + j][pixX + i] = 1;
+					canvasBin[pixY + j][pixX + i] = erase ? 0 : 1;
 				}
 				var pix = ((pixY + j) * canvas.width) + pixX + i;
 				pix *= 4;
 				for(var k = 0; k < 4; k++){
-					imageData.data[pix + k] = rgba[k];
+					imageData.data[pix + k] = erase ? 0 : rgba[k];
 					if(type != "path"){
-						pathlessData.data[pix + k] = rgba[k];
+						pathlessData.data[pix + k] = erase ? 0 : rgba[k];
 					}
 				}
 			}
@@ -144,6 +145,13 @@ function getPath(arr){
 	}
 	//printArr(arr);
 	return currNode.x == targetNode.x && currNode.y == targetNode.y ? currNode : null;
+}
+
+function resetCanvas(){
+	var newCanvas = ctx.createImageData(canvas.width, canvas.height);
+	ctx.putImageData(newCanvas, 0, 0);
+	pathlessData = ctx.createImageData(canvas.width, canvas.height);
+	makeCanvasBin(canvas);
 }
 
 

@@ -1,6 +1,7 @@
 var currentlyOpen;
 var mousedown = false;
 var evacuated = false;
+var toggle1 = false;
 var borders = new Map(
   [
       ["exBuild", "mistyrose"], 
@@ -44,7 +45,7 @@ function makeExpressionBuilderConsole(){
 
   var container = document.createElement("container");
   container.setAttribute("class", "textContainer");
-  container.style = "display: flex; flex-wrap: wrap; align-content: flex-start;width: 100%; left: 0%;";
+  container.style = "display: flex; flex-wrap: wrap; align-content: flex-start; width: 100%; left: 0%;";
   container.appendChild(makeTitle("Expression Builder"));
   expBuild.appendChild(container);
 
@@ -84,7 +85,7 @@ function makeExpressionBuilderConsole(){
   
 
    	var goButton = document.createElement("button");
-   	goButton.style = "top: 41%; left: 45%; background-color: #e4e1ff;";
+   	goButton.style = "top: 41%; left: 45%; padding: 1% 5%; width: 15%; font-size: 2.5vh";
    	goButton.innerHTML = "GO!";
    	goButton.onclick = () => {runExpressionBuilder(input1.value, input2.value)};
    	container.append(goButton);
@@ -105,9 +106,10 @@ function makeExpressionBuilderConsole(){
    					"larger number on the right. It's going to take quite a while because even though you only entered a few more numbers, " +
    					"the computer must process billions more permutations. How long do you think it would take with nine numbers? Or ten?"
 
-   	desc.style.top = "50%";
-   	desc.style.height = "35%";
+   	desc.style.top = "51%";
+   	desc.style.height = "33%";
    	container.appendChild(desc);
+    addXout(expBuild);
 }
 
 function makeCreditsConsole(){
@@ -129,6 +131,7 @@ function makeCreditsConsole(){
 	desc.style.bottom = "5%";
   textContainer.appendChild(makeTitle("Credits"));
   textContainer.appendChild(desc);
+  addXout(credits);
 }
 
 function makeAboutConsole(){
@@ -170,6 +173,7 @@ function makeAboutConsole(){
 	desc.style.top = "16%";
 	desc.style.bottom = "5%";
 	textContainer.appendChild(desc);
+  addXout(about);
 }
 
 function makePathFinderConsole(){
@@ -199,9 +203,9 @@ function makePathFinderConsole(){
   canvas.style.left = "0%";
   canvas.width = 1000;
   canvas.height = 500;
-  canvas.addEventListener("mousedown", (e) => {mousedown = true; console.log(e.type)});
-  canvas.addEventListener("mouseup", (e) => {mousedown = false; drawShortestPath(); console.log(e.type);});
-  canvas.addEventListener("mousemove", (e) => {if(mousedown) updateCanvas(e); console.log(e.type);});
+  canvas.addEventListener("mousedown", (e) => {mousedown = true;});
+  canvas.addEventListener("mouseup", (e) => {mousedown = false; drawShortestPath();});
+  canvas.addEventListener("mousemove", (e) => {if(mousedown) updateCanvas(e, toggle1);});
 
   var textContainer = document.createElement("container");
   textContainer.setAttribute("class", "textContainer");
@@ -213,6 +217,25 @@ function makePathFinderConsole(){
   title.style.left = "0%";
   title.setAttribute("position", "relative");
   textContainer.appendChild(title);
+
+  var resetButton = document.createElement("button");
+  resetButton.id = "resetButton";
+  resetButton.style = "left: 4%; bottom: 5%; height: 5%; width: 3%; z-index: 2000000; font-size: 2vh"
+  resetButton.innerHTML = "R";
+  resetButton.onclick = () => {resetCanvas();}
+  pf.appendChild(resetButton);
+
+  var eraseButton = document.createElement("button");
+  eraseButton.id = "eraseButton";
+  var ebBaseStyle = "left: 8%; bottom: 5%; height: 5%; width: 3%; z-index: 2000000; font-size: 2vh;";
+  eraseButton.style = ebBaseStyle;
+  eraseButton.innerHTML = "E";
+  eraseButton.onclick = () => {
+    toggle1 = !toggle1;
+    eraseButton.style = ebBaseStyle + (toggle1 ? " background-color: azure;" : "");
+  }
+  pf.appendChild(eraseButton);
+
 
   desc = document.createElement("p")
   desc.innerHTML = "Instructions: Drag your mouse over the left-side canvas to construct the walls of your maze. The computer will attempt to find a " +
@@ -232,9 +255,19 @@ desc.style.height = "80%";
 textContainer.appendChild(desc)
 
 pf.appendChild(textContainer);
+addXout(pf);
 evacuateAll(false);
 evacuated = true;
 initialize();
+}
+
+function addXout(elem){
+  var xout = document.createElement("button");
+  xout.setAttribute("class", "xout");
+  xout.id = "xout";
+  xout.innerHTML = "X";
+  xout.addEventListener("click", receiveBgroundClick);
+  elem.appendChild(xout);
 }
 
 function makeBlackConsole(){
@@ -243,6 +276,7 @@ function makeBlackConsole(){
     title.innerHTML = "This block doesn't have a code project bound to it yet. Try another color. " +
      					"Click anywhere else onscreen to remove this panel.";
     blank.appendChild(title);
+    addXout(blank);
 }
 
 function makeGenericConsoleTemplate(name){

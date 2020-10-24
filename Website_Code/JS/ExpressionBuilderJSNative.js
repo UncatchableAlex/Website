@@ -41,11 +41,12 @@ function runExpressionBuilder(params, target){
         return;
     }
     document.getElementById("bloops").innerHTML = "";
+    for(let id of ids.keys()){
+        window.clearInterval(intervals.get(id));
+    }
     evacuateAll();
-    setTimeout(() => {document.getElementById("bloops").innerHTML = "";}, evacuateTime * 800);
     setTimeout(
             () => {
-                document.getElementById("bloops").innerHTML = "";
                 newDiv.innerHTML = buildExpression(nums, target);
                 document.getElementById("answerDisplay").appendChild(newDiv);
                 makeOrbiters();

@@ -17,16 +17,15 @@ function receiveMouseDown(e){
 	var firstPoint = [(firstRect.left + firstRect.right) / 2, (firstRect.top + firstRect.bottom)  / 2];
 	offsetLeft = e.clientX - firstRect.left;
 	offsetTop = e.clientY - firstRect.top;
-	origDist = getDist(center, firstPoint);
 	window.requestAnimationFrame(
 		() => {
 				window.requestAnimationFrame(
 					() => {
 						var secondRect = orbiter.getBoundingClientRect()
 						var secondPoint = [(secondRect.left + secondRect.right) / 2, (secondRect.top + secondRect.bottom) / 2];
-						//console.log(secondRect);
 						var vec = [secondPoint[0] - firstPoint[0], secondPoint[1] - firstPoint[1]];
 						origAngle = Math.atan(vec[1]/vec[0]);
+						origAngle = origAngle > (Math.PI / 4) ? (-1 * Math.PI / 2) + origAngle : origAngle;
 						orbiter.style.top = e.clientY - offsetTop;
 						orbiter.style.left = e.clientX - offsetLeft;
 						orbiter.setAttribute("class", "beingDragged");
@@ -40,6 +39,7 @@ function receiveMouseDown(e){
 				);	
 			}
 		);
+	origDist = getDist(center, [e.clientX - offsetLeft, e.clientY - offsetTop]);
 }
 
 function receiveMouseMove(e){
@@ -84,7 +84,14 @@ function windowResizeDone(){
 	windowResize = setTimeout( 
 		()=> {
 			evacuateAll();
-			setTimeout(()=>{location.reload();}, 2000);
+			setTimeout(()=>{
+				bodies = document.getElementById("bodies");
+				bodies.innerHTML = ""; 
+				bloops = document.createElement("section")
+				bloops.id = "bloops";
+				bodies.append(bloops);
+				makeOrbiters();
+			}, 2000);
 		}, 500);
 }
 
