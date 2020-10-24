@@ -239,7 +239,7 @@ function makePathFinderConsole(){
 
   desc = document.createElement("p")
   desc.innerHTML = "Instructions: Drag your mouse over the left-side canvas to construct the walls of your maze. The computer will attempt to find a " +
-                  " passage from the top left to the bottom right. If it is unable, it will give up and the game is over. <br><br>" + 
+                  " passage from the top left to the bottom right. If it is unable, it will give up and the game is over. Use \"R\" to reset and \"E\" to toggle the eraser. <br><br>" + 
                   "Description: Perhaps by now you have seen the \"depth-first\" exhibit and the stunning precision that it can achieve. Often overlooked, however,"+
                   " is its sister searching algorithm: the \"breadth-first\" search. Neither algorithm is better in all cases, and a lot of the time, deciding "+
                   "between them can be a challenge. If depth-first searching is like lightning, always looking for an expansion node furthest away from its source, " +
