@@ -34,9 +34,12 @@ Queue.prototype.toString = function(){
 	str = "[";
 	currNode = this.head;
 	while(currNode != null){
-		str += (currNode.data + ", ");
+		str += (currNode.data.toString() + ", ");
 		currNode = currNode.next;
 	}
-	return str.substring(0, str.length - 2) + "]";
+	return this.isEmpty() ? "[]" : str.substring(0, str.length - 2) + "]";
+}
+Queue.prototype.isEmpty = function(){
+	return this.length == 0;
 }
 

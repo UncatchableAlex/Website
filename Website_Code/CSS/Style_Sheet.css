@@ -65,15 +65,20 @@
 				user-select: none;
 				cursor: pointer;
 			}
-			canvas, .textContainer{
+			img{
+				border-color: lightgrey;
+			}
+			canvas, img, .textContainer{
 				position: absolute;
+				border-width: 2%;
+				border-style: solid;
+				background: white;
+			}
+			canvas, .textContainer{
+				border-color: lightslategrey;
 				top: 0%;
 				width: 70%;
 				height: 100%;
-				border-width: 2%;
-				border-color: lightslategrey;
-				border-style: solid;
-				background: white;
 			}
 			.border{
 				position: absolute;

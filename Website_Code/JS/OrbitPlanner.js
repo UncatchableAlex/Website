@@ -1,5 +1,5 @@
 var bloopNum;
-var ids = new Map([["expBuild", "salmon"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["e","red"]]);
+var ids = new Map([["expBuild", "red"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["gameOfLife", "darkviolet"]]);
 var bloopTimeout = 2000;
 var bloopRefresh = 80;
 var blockWidth = 150;
@@ -12,7 +12,7 @@ var rules = new Array();
 var ss = document.styleSheets[0];
 var intervals = new Map();
 function makeOrbiters(keys = Array.from(ids.keys()), dpoint = null){
-	secsPerSegment = (window.innerWidth / 1707) * 5;
+	secsPerSegment = (window.innerWidth / 1707) * 6;
 	// get the document's stylesheet:
 	// for each id:
 	for(var i = 0; i < keys.length; i++){

@@ -12,20 +12,21 @@ var lowerBoundY, upperBoundY, leftBoundX, rightBoundX;
 var borderDrawn = false;
 var ctx;
 
-function makeCanvasBin(canvas){
+function makeBlankArr(can){
 	canvas = document.getElementById("pfcanvas");
-	canvasBin = new Array();
-	for(var i = 0; i < canvas.height; i++){
+	blankArr = new Array();
+	for(var i = 0; i < can.height; i++){
 		var myCol = new Array();
-		for(var j = 0; j < canvas.width; j++){
+		for(var j = 0; j < can.width; j++){
 			myCol.push(0);
 		}
-		canvasBin.push(myCol);
+		blankArr.push(myCol);
 	}
-	lowerBoundY = (canvasBin.length * 0.95) << 0;
-	rightBoundX = (canvasBin[0].length * 0.95) << 0;
-	leftBoundX = (canvasBin[0].length * 0.05) << 0;
-	upperBoundY = (canvasBin.length * 0.05) << 0;
+	lowerBoundY = (blankArr.length * 0.95) << 0;
+	rightBoundX = (blankArr[0].length * 0.95) << 0;
+	leftBoundX = (blankArr[0].length * 0.05) << 0;
+	upperBoundY = (blankArr.length * 0.05) << 0;
+	return blankArr;
 }
 
 function copyArray(arr){
@@ -51,7 +52,7 @@ function drawShortestPath(){
 	prevCanX = prevCanY = null;
 }
 
-function updateCanvas(e, erase = false){
+function updatePfCanvas(e, erase = false){
 	//console.log("updating canvas");
 	canvas = document.getElementById("pfcanvas");
 	var rect = canvas.getBoundingClientRect();
@@ -105,14 +106,14 @@ function drawDot(imageData, pixX, pixY, rgba, radius, erase = false, type = "use
 		}
 }
 
-function initialize(){
+function pfInitialize(){
 	canvas = document.getElementById("pfcanvas");
 	ctx = canvas.getContext("2d");
 	imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 	pathlessData = ctx.createImageData(imageData);
 	pathThickness = canvas.width * 0.002;
 	userThickness = canvas.width * 0.006;
-	makeCanvasBin();
+	canvasBin = makeBlankArr(canvas);
 }
 
 function getPathArr(node){
@@ -129,7 +130,7 @@ function getPath(arr){
 	var currNode = new Node(leftBoundX + 1, upperBoundY + 1);
 	var queue = new Queue();
 	queue.push(currNode);
-	while(queue.length != 0){
+	while(!queue.isEmpty()){
 		for(var i = Math.max(currNode.y - 1, upperBoundY); i <= Math.min(currNode.y + 1, lowerBoundY); i++){
 			for(var j = Math.max(currNode.x - 1, leftBoundX); j <= Math.min(currNode.x + 1, rightBoundX); j++){
 				if(i == targetNode.y && j == targetNode.x){
@@ -148,14 +149,14 @@ function getPath(arr){
 	return currNode.x == targetNode.x && currNode.y == targetNode.y ? currNode : null;
 }
 
-function resetCanvas(){
+function resetPfCanvas(){
 	var newCanvas = ctx.createImageData(canvas.width, canvas.height);
 	ctx.putImageData(newCanvas, 0, 0);
 	pathlessData = ctx.createImageData(canvas.width, canvas.height);
-	makeCanvasBin(canvas);
+	canvasBin = makeBlankArr(canvas);
 }
 
-
+	
 function printArr(arr){
 	var str = "";
 	for(var i = 0; i < arr.length; i++){

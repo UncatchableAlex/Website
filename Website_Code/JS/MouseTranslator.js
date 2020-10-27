@@ -74,11 +74,6 @@ function receiveMouseUp(e){
 	makeOrbiters([orbiter.id]);
 }
 
-function getBlockAngle(width, rad = true){
-	 var rads = (Math.PI/4) - Math.acos(width / diagonalLength);
-	 return rads * (180 / Math.PI)
-}
-
 function windowResizeDone(){
 	clearTimeout(windowResize);
 	windowResize = setTimeout( 

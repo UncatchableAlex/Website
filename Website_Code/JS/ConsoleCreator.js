@@ -1,16 +1,29 @@
+// for everyone:
 var currentlyOpen;
-var mousedown = false;
 var evacuated = false;
-var toggle1 = false;
 var borders = new Map(
   [
       ["exBuild", "mistyrose"], 
       ["blank", "hotpink"], 
       ["credits", "powderblue"], 
       ["about", "lightgoldenrodyellow"], 
-      ["pathfinder", "#FFC6C6"]
+      ["pathfinder", "#FFC6C6"],
+      ["gameOfLife", "lavender"]
   ]
 );
+
+
+// for be amazed
+var mousedown = false;
+var toggle1 = false;
+
+// for game of life console:
+var prevPattern;
+var currPattern;
+var tickInterval;
+var tickFrequency;
+
+
 function makeConsole(id){
 	switch(id){
 		case("expBuild"): 
@@ -24,6 +37,9 @@ function makeConsole(id){
 			break;
     case("amaze"):
       makePathFinderConsole();
+      break;
+    case("gameOfLife"):
+      makeGameOfLifeConsole();
       break;
 		default:
 			makeBlackConsole();
@@ -205,7 +221,7 @@ function makePathFinderConsole(){
   canvas.height = 500;
   canvas.addEventListener("mousedown", (e) => {mousedown = true;});
   canvas.addEventListener("mouseup", (e) => {mousedown = false; drawShortestPath();});
-  canvas.addEventListener("mousemove", (e) => {if(mousedown) updateCanvas(e, toggle1);});
+  canvas.addEventListener("mousemove", (e) => {if(mousedown) updatePfCanvas(e, toggle1);});
 
   var textContainer = document.createElement("container");
   textContainer.setAttribute("class", "textContainer");
@@ -222,7 +238,7 @@ function makePathFinderConsole(){
   resetButton.id = "resetButton";
   resetButton.style = "left: 4%; bottom: 5%; height: 5%; width: 3%; z-index: 2000000; font-size: 2vh"
   resetButton.innerHTML = "R";
-  resetButton.onclick = () => {resetCanvas();}
+  resetButton.onclick = () => {resetPfCanvas();}
   pf.appendChild(resetButton);
 
   var eraseButton = document.createElement("button");
@@ -239,7 +255,8 @@ function makePathFinderConsole(){
 
   desc = document.createElement("p")
   desc.innerHTML = "Instructions: Drag your mouse over the left-side canvas to construct the walls of your maze. The computer will attempt to find a " +
-                  " passage from the top left to the bottom right. If it is unable, it will give up and the game is over. Use \"R\" to reset and \"E\" to toggle the eraser. <br><br>" + 
+                  " passage from the top left to the bottom right. If it is unable, it will give up and the game is over. Use \"R\" to reset and \"E\" to toggle the eraser. " + 
+                  "Please make an epic maze to do this demo justice. <br><br>" + 
                   "Description: Perhaps by now you have seen the \"depth-first\" exhibit and the stunning precision that it can achieve. Often overlooked, however,"+
                   " is its sister searching algorithm: the \"breadth-first\" search. Neither algorithm is better in all cases, and a lot of the time, deciding "+
                   "between them can be a challenge. If depth-first searching is like lightning, always looking for an expansion node furthest away from its source, " +
@@ -258,7 +275,102 @@ pf.appendChild(textContainer);
 addXout(pf);
 evacuateAll(false);
 evacuated = true;
-initialize();
+pfInitialize();
+}
+
+function makeGameOfLifeConsole(){
+  evacuateAll(false);
+  evacuated = true;
+  var gol = makeGenericConsoleTemplate("gameOfLife");
+  gol.style.height = gol.style.width = "80%";
+  gol.style.top = "5%";
+  gol.style.left = "7.5%";
+
+  var canvasContainer = document.createElement("container");
+  gol.appendChild(canvasContainer);
+  var golCanvas = document.createElement("canvas");
+  golCanvas.id = "golCanvas";
+  golCanvas.style.left = "0%";
+  golCanvas.style.top = "0%";
+  golCanvas.width = 12000;
+  golCanvas.height = 9000;
+  golCanvas.addEventListener("click", function(e){placePattern(e, currPattern)})
+  canvasContainer.appendChild(golCanvas);
+
+  var patternList = ["block", "bheptomino", "rpentomino", "fpentomino", "spacefiller"];
+  for(var i = 0; i < patternList.length; i++){
+    gol.appendChild(makeTile(3 + (i * 7) + "%", "5%", patternList[i]));
+  }
+  prevPattern = patternList[0];
+  currPattern = patternList[0];
+  document.getElementById(patternList[0]).style.borderColor = "black";
+
+  var reset = document.createElement("button");
+  reset.innerHTML = "RESET!";
+  reset.style = "left: 59%; top: 10%; height: 5%; width: 7%; background: red; border: 2px solid black; font-size: 2.3vh";
+  reset.onclick = function(){
+    golInitialize(200);
+  }
+  gol.appendChild(reset);
+
+  var goButton = document.createElement("button");
+  goButton.innerHTML = "GO!";
+  goButton.style = "left: 59%; top: 4%; height: 5%; width: 7%; background: palegreen; border: 2px solid black; font-size: 2.3vh";
+  goButton.onclick = function(){
+    if(goButton.innerHTML == "GO!"){
+      if(tickInterval != null){
+        clearInterval(tickInterval);
+      }
+      tickInterval = setInterval(tick, tickFrequency);
+      goButton.innerHTML = "STOP!";
+      goButton.style.background = "pink";
+    } else {
+      clearInterval(tickInterval);
+      tickInterval = null;
+      goButton.innerHTML = "GO!";
+      goButton.style.background = "palegreen";
+    }
+  }
+  gol.appendChild(goButton);
+
+  var slider = document.createElement("input");
+  slider.style = "width: 15%; height: 5%; top: 7%; left: 40%;";
+  slider.type = "range";
+  slider.min = "1"; 
+  slider.max = "100";
+  slider.value = "30";
+  slider.id = "frequencySlider";
+  slider.oninput = function(){
+    console.log(slider.value);
+    tickFrequency = (1000 / slider.value) << 0;
+    if(goButton.innerHTML == "STOP!"){
+       if(tickInterval != null){
+          clearInterval(tickInterval);
+        }
+      tickInterval = setInterval(tick, tickFrequency);
+    }
+  }
+  gol.appendChild(slider);
+
+  tickFrequency = (1000 / slider.value) << 0;
+
+  var descContainer = document.createElement("container");
+  descContainer.setAttribute("class", "textContainer");
+  descContainer.style = "left: 70%; top: 0%; width: 30%";
+  gol.appendChild(descContainer);
+
+  descContainer.appendChild(makeTitle("Life..."));
+
+  desc = document.createElement("p"); 
+
+  desc.innerHTML = "This demonstration is based off of John Conway's " + italicize("Game of Life") + " but with a colorful twist. To the left there is a board" +
+  " consisting of many \"dead\" cells in a large grid. The rules are simple: <br><br> 1.) Every turn, a dead cell will become alive if three of its eight neighbors are alive " +
+  "<br>2.) Every turn, a live cell will die if more than three or fewer than two of its neighbors are alive. <br><br> To start, please select a tile from along the top bar of the left canvas " +
+  " (its border will become dark when selected) and click on the canvas to place it. Click \"GO!\" to start the simulation and use the slider to control the speed. Good luck!"
+
+  descContainer.appendChild(desc);
+  golInitialize(200);
+
 }
 
 function addXout(elem){
@@ -290,11 +402,30 @@ function makeGenericConsoleTemplate(name){
 }
 
 function makeTitle(contents){
-	title = document.createElement("h2");
+	var title = document.createElement("h2");
 	title.innerHTML = contents;
 	return title;
 }
 
 function italicize(str){
 	return str.italics();
+}
+
+function makeTile(left, top, patternName){  
+  var image = document.createElement("img");
+  image.src = "PatternPics/" + patternName + ".png";
+  image.id = patternName;
+  image.style = "left: " + left + "; top: " + top + "; height: 7vh; width: 7vh;";
+  image.addEventListener("click", function(){
+    if(patternName == prevPattern){
+      return;
+    }
+    currPattern = patternName;
+    image.style.borderColor = "black";
+    try{
+      document.getElementById(prevPattern).style.borderColor = "lightgrey";
+    }catch(error){/*ignore*/}
+    prevPattern = patternName;
+  });
+  return image;
 }
