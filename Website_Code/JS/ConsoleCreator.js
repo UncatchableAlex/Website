@@ -369,6 +369,7 @@ function makeGameOfLifeConsole(){
   " (its border will become dark when selected) and click on the canvas to place it. Click \"GO!\" to start the simulation and use the slider to control the speed. Good luck!"
 
   descContainer.appendChild(desc);
+  addXout(gol);
   golInitialize(200);
 
 }
