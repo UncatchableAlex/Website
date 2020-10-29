@@ -280,7 +280,7 @@ function evacuate(id, dropInPoint){
 		orbiter.classList.remove(orbiter.classList[i]);
 	}
 	orbiter.style = getRunStyle(dropInPoint, ids.get(id));
-	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.path[0])})
+	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.currentTarget)})
 }
 
 function getRunStyle(dropInPoint, color){

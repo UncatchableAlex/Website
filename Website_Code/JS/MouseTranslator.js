@@ -9,7 +9,7 @@ var windowResize = -1;
 var remakeOrbiters = -1;
 function receiveMouseDown(e){
 	center = [(window.innerWidth - blockWidth) / 2, (window.innerHeight - blockHeight) / 2];
-	orbiter = e.path[0];
+	orbiter = e.currentTarget;
 	if(!Array.from(ids.keys()).includes(orbiter.getAttribute("class"))){
 		return;
 	}

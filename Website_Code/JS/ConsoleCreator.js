@@ -279,8 +279,6 @@ pfInitialize();
 }
 
 function makeGameOfLifeConsole(){
-  evacuateAll(false);
-  evacuated = true;
   var gol = makeGenericConsoleTemplate("gameOfLife");
   gol.style.height = gol.style.width = "80%";
   gol.style.top = "5%";
@@ -368,10 +366,15 @@ function makeGameOfLifeConsole(){
   "<br>2.) Every turn, a live cell will die if more than three or fewer than two of its neighbors are alive. <br><br> To start, please select a tile from along the top bar of the left canvas " +
   " (its border will become dark when selected) and click on the canvas to place it. Click \"GO!\" to start the simulation and use the slider to control the speed. Good luck!"
 
+  desc.style.height = "80%";
+  desc.style.top = "12%";
+  desc.style.width = "90%";
   descContainer.appendChild(desc);
   addXout(gol);
   golInitialize(200);
 
+  evacuateAll(false);
+  evacuated = true;
 }
 
 function addXout(elem){
@@ -414,7 +417,7 @@ function italicize(str){
 
 function makeTile(left, top, patternName){  
   var image = document.createElement("img");
-  image.src = "PatternPics/" + patternName + ".png";
+  image.src = "PatternPics/" + patternName + ".PNG";
   image.id = patternName;
   image.style = "left: " + left + "; top: " + top + "; height: 7vh; width: 7vh;";
   image.addEventListener("click", function(){
