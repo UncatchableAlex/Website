@@ -184,7 +184,8 @@ function placePattern(e, pname){
 			var cellsOver = pixX / cellSize;
 			var cellsDown = pixY / cellSize;
 			// if the pixel of the pattern is onscreen
-			if(pattern[j][i] == 1 && cellsOver < cellArr[0].length && cellsDown < cellArr.length && !cellArr[cellsDown][cellsOver].isAlive){
+			if(cellsOver < cellArr[0].length  && cellsDown < cellArr.length && cellsOver >= 0 && 
+				cellsDown >= 0 && !cellArr[cellsDown][cellsOver].isAlive && pattern[j][i] == 1){
 				var currCell = cellArr[cellsDown][cellsOver];
 				currCell.isAlive = true;
 				//currCell.origin = [(canX + patternOffsetX) / cellSize, (canY + patternOffsetY) / cellSize];
@@ -212,7 +213,7 @@ function golInitialize(numCellsAcross = 200){
 	if(golCanvas.height % cellSize != 0){
 		throw "cell height isn't a factor of golCanvas height";
 	}
-	ctx = golCanvas.getContext("2d");
+	ctx = golCanvas.getContext("2d", {alpha: false});
 	cellArr = makeCellArr(golCanvas);
 	birthSet.clear();
 	killSet.clear();
