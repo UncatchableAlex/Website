@@ -58,6 +58,9 @@
 			// if the user resizes the window, repath all of the blocks. The repathing will go into effect after 
 			//delayOnResize milliseconds of no additional resize adjustments:
 			function windowResizeDone(){
+				if(orbitPlanner.consoleCreator.evacuated == true){
+					return;
+				}
 				clearTimeout(windowResize);
 				orbitPlanner.evacuateAll();
 				setTimeout( () => {

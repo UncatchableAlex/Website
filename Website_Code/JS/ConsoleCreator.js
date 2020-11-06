@@ -2,6 +2,16 @@
 
 class ConsoleCreator{
 
+  static SHOULD_EVAC = new Map(
+      [
+          ["expBuild", false],
+          ["credits", false],
+          ["about", false],
+          ["amaze", true],
+          ["gameOfLife", true]
+      ]
+    );
+
   constructor(orbitPlanner){
     // for everyone:
     this.orbitPlanner = orbitPlanner;
@@ -30,6 +40,10 @@ class ConsoleCreator{
   			this.makeBlackConsole();
   			break;
   	}
+    if(ConsoleCreator.SHOULD_EVAC.get(id)){
+      this.orbitPlanner.evacuateAll();
+      this.evacuated = true;
+    }
   }
 
  closeConsole(){
@@ -60,15 +74,11 @@ class ConsoleCreator{
   makePathFinderConsole(){
     this.currentConsole = new Pathfinder(this, "pfCanvas", 1000, 500);
     this.currentConsole.renderConsole();
-    this.orbitPlanner.evacuateAll();
-    this.evacuated = true;
   }
 
   makeGameOfLifeConsole(){
     this.currentConsole = new GameOfLife(this, "golCanvas");
     this.currentConsole.renderConsole();
-    this.orbitPlanner.evacuateAll();
-    this.evacuated = true;
   }
 }
 
@@ -83,6 +93,7 @@ class Console{
     }
     this.headElem.remove();
     this.headElem = null;
+    this.consoleCreator.currentConsole = null;
   }
   addXout(elem){
     let xout = document.createElement("button");
