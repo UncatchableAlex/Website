@@ -1,295 +1,225 @@
-var bloopNum;
-var ids = new Map([["expBuild", "red"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["gameOfLife", "darkviolet"]]);
-var bloopTimeout = 2000;
-var bloopRefresh = 80;
-var blockWidth = 150;
-var blockHeight = 150;
-var evacuateTime = 0.6;
-var secsPerSegment;
-//how smooth the curves transitions are guarenteed to be. Higher number is smoother. Choose number between 0 and pi/2:
-var smoothness = Math.PI/6;
-var rules = new Array();
-var ss = document.styleSheets[0];
-var intervals = new Map();
-function makeOrbiters(keys = Array.from(ids.keys()), dpoint = null){
-	secsPerSegment = (window.innerWidth / 1707) * 6;
-	// get the document's stylesheet:
-	// for each id:
-	for(var i = 0; i < keys.length; i++){
-		var id = keys[i];
+"use strict";
+class OrbitPlanner{
+	static IDS_GENERIC = new Map([["expBuild", "red"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["gameOfLife", "darkviolet"]]);
+	static BLOOP_REFRESH_INTERVAL = 80;
+	static ORBITER_WIDTH = 150;
+	static ORBITER_HEIGHT = 150;
+	static EVACUATE_TIME = 0.6;
+	static CURVINESS = [300, 500]; 
+	static CURVE_FACTOR = [0.50, 0.75];
+	static SEGMENTS = [30, 50];
+	static ALEX_SCREEN_WIDTH = 1707;
+	static VEC_RAD_FLOOR = 500;
+	static SPEED_MULTIPLIER = 6;
+
+	constructor(concurrentAllowed = false, ids = OrbitPlanner.IDS_GENERIC, consoleCreator = null, mouseTranslator = new MouseTranslator(), styleSheet = null){
+		this.concurrentAllowed = concurrentAllowed;
+		this.bloopNum;
+		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_MULTIPLIER;
+		this.rules;
+		this.intervals = new Map();
+		this.orbiting = new Set();
+
 		try{
-			var dropInPoint = dPoint[0] == null ? getOffScreenPoint() : dPoint;
+			this.styleSheet = styleSheet == null ? document.styleSheets[0] : styleSheet;
 		} catch(error){
-			var dropInPoint = getOffScreenPoint();
+			throw "StyleSheetException: Declare or pass stylesheet first";
 		}
-			var h = window.innerHeight, w = window.innerWidth;
+		try{
+			let bloopDurationStr = Util.getCssRule(this.styleSheet, ".bloop").style.animationDuration;
+			this.bloopDuration = parseFloat(bloopDurationStr.substring(0, bloopDurationStr.length - 1)) * 1000;
+		} catch(error){
+			throw "StyleSheetException: Stylesheet must have .bloop class with animation duration attribute."
+		}
+		this.consoleCreator = new ConsoleCreator(this);
+		this.ids = ids;
+		this.mouseTranslator = mouseTranslator;
+		this.vecRad = Math.min(OrbitPlanner.VEC_RAD_FLOOR, window.innerWidth / 3);
+	}
+
+	makeOrbiters(keys = Array.from(this.ids.keys()), dpoint = null){
+		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_MULTIPLIER;
+		this.vecRad = Math.min(OrbitPlanner.VEC_RAD_FLOOR, window.innerWidth / 3);
+		// get the document's stylesheet:
+		// for each id:
+		let self = this;
+		for(let id of keys){
+			if(!this.concurrentAllowed && this.orbiting.has(id)){
+				continue;
+			}
+			this.orbiting.add(id);
+			try{
+				var dropInPoint = [dpoint[0], dpoint[1]];
+			} catch(error){
+				var dropInPoint = Util.getOffScreenPoint();
+			}
+			let h = window.innerHeight, w = window.innerWidth;
 			// make new rule for the specific id and add it to the stylesheet:
-			ss.insertRule(makeRule(id, dropInPoint));
+			Util.deleteCssRule(this.styleSheet, "." + id);
+			this.styleSheet.insertRule(this.makeRule(id, dropInPoint));
 			// make a new div element:
-			var orbiter = document.createElement("div");
+			let orbiter = document.createElement("div");
 			// set its class to the stylesheet that was just created:
 			orbiter.setAttribute("class", id);
 			orbiter.setAttribute("id", id);
-			orbiter.addEventListener("mousedown", e => {receiveMouseDown(e)})
+			let self = this;
+			let md = function(e){self.mouseTranslator.receiveMouseDown(e, self);}
+			orbiter.removeEventListener("mousedown", md);
+			orbiter.addEventListener("mousedown", md);
 			document.getElementById("bodies").appendChild(orbiter);
-			clearInterval(intervals.get(id));
-			intervals.set(id, setInterval(makeBloop, bloopRefresh, id));
+			clearInterval(this.intervals.get(id));
+			let makeBloop = this.makeBloop.bind(this);
+			this.intervals.set(id, setInterval(makeBloop, OrbitPlanner.BLOOP_REFRESH_INTERVAL, orbiter));
 		}
-}
-
-
-function killBloop(id){
-	try{
-		document.getElementById(id).remove();
-	}catch(error){
-		console.log("Bloop already cleared. Moving on");
 	}
-}
 
 
-function makeBloop(id){
-	var node = document.getElementById(id);
-	if(node == null){
-		return;
+	makeBloop(orbiter){
+		let self = this;
+		if(orbiter == null){
+			return;
+		}
+		this.bloopNum = (this.bloopNum < 2000000) ? ++this.bloopNum : 0;
+		let rect = orbiter.getBoundingClientRect();
+		// fancy divide by 2 (bitshift):
+		let left = (rect.left + rect.right) >> 1;
+		let top = (rect.top + rect.bottom) >> 1;
+		let bloop = document.createElement("div");
+		bloop.setAttribute("class", "bloop");
+		bloop.id =  "bloop" + this.bloopNum;
+		bloop.style = "top: " + top + "px; left: " + left + "px;";
+		bloop.setAttribute("data", orbiter.id);
+		document.getElementById("bloops").appendChild(bloop);
+		setTimeout( () => {
+			try{
+				bloop.remove();
+			} catch(error){
+				//bloop already removed. ignore.
+			}
+		}, this.bloopDuration);
 	}
-	bloopNum = (bloopNum < 2000000) ? ++bloopNum : 0;
-	var rect = node.getBoundingClientRect();
-	var left = (rect.left + rect.right) >> 1;
-	var top = (rect.top + rect.bottom) >> 1;
-	var bloop = document.createElement("div");
-	bloop.setAttribute("class", "bloop");
-	bloop.setAttribute("id", "bloop" + bloopNum);
-	bloop.setAttribute("style", "top: " + top + "px; left: " + left + "px;");
-	document.getElementById("bloops").appendChild(bloop);
-	setTimeout(killBloop, bloopTimeout, bloop.id);
-}
 
-function makeRule(id, dropInPoint){
-	if(ids.has(id)){
-		rules = ss.rules
-		for(var j = 0; j < rules.length; j++){
-			if(rules[j].selectorText == ("." + id)){
-				ss.deleteRule(j);
+	makeRule(id, dropInPoint){
+		if(!this.ids.has(id)){
+			throw "No corresponding ids found in the id map";
+		}
+		// make a point to end at (don't be confused as to the name. It will make sense later):
+		let startPoint = Util.getRandomPoint(dropInPoint, this.vecRad);
+		// make a random first control point:
+		let firstCtrl = this.getFirstCtrlPoint(Util.getRandomPoint(dropInPoint, this.vecRad), dropInPoint);
+		// make a second control point (once again, the name will make sense later):
+		let prevCtrl = this.getSecondCtrlPoint(dropInPoint, firstCtrl, startPoint); 
+		// these guys will be used later. Keep them null for now though:
+		let ctrlPoint2, ctrlPoint1, endPoint;
+		// start making a new rule:
+		let rule = "." + id + "{cursor: pointer; background: " + this.ids.get(id) + "; position: absolute; border-radius: 0%; height: " + OrbitPlanner.ORBITER_HEIGHT + "px; width: " + 
+					OrbitPlanner.ORBITER_WIDTH + "px;" + " top:0px; left: 0px; z-index: 20; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
+					firstCtrl[1] + " " + prevCtrl[0] + " " + prevCtrl[1] + " " + startPoint[0] + " " + startPoint[1];
+		// make between 7 and 15 svg bezier curve paths:
+		const iterations = Util.getRandomIntInRange(OrbitPlanner.SEGMENTS[0], OrbitPlanner.SEGMENTS[1]);
+		for(let i = 0; i < iterations; i++){
+			// get a control point that is colinear with the startpoint and the last control point:
+			ctrlPoint1 = this.getFirstCtrlPoint(prevCtrl, startPoint);
+			// generate a random end point that is at least this.vecRad px away from the starting point:
+			endPoint = Util.getRandomPoint(startPoint, this.vecRad);
+			ctrlPoint2 = this.getSecondCtrlPoint(startPoint, ctrlPoint1, endPoint);
+			// append the curve to our rule:
+			rule += (" C " + ctrlPoint1[0] + " " + ctrlPoint1[1] + " " + ctrlPoint2[0] + " " + ctrlPoint2[1] + " " + endPoint[0] + " " + endPoint[1]);
+			// update prevCtrl and startPoint for next iteration:
+			prevCtrl = ctrlPoint2;
+			startPoint = endPoint;
+		}
+		// add a final destination offscreen:
+		ctrlPoint1 = this.getFirstCtrlPoint(prevCtrl, startPoint);
+		endPoint = Util.getOffScreenPoint();
+		ctrlPoint2 = this.getSecondCtrlPoint(startPoint, ctrlPoint1, endPoint);
+		rule += (" C " + ctrlPoint1[0] + " " + ctrlPoint1[1] + " " + ctrlPoint2[0] + " " + ctrlPoint2[1] + " " + endPoint[0] + " " + endPoint[1]);
+		// append to complete a pretty pretty pretty animation rule:
+		rule += "'); offset-distance: 0%; animation: orbit; animation: orbit " + (iterations * this.secsPerSegment) + "s linear infinite; animation-fill-mode: forwards;}";
+		console.log(rule);
+		return rule;
+	}
+
+	getFirstCtrlPoint(prevCtrl, startPoint){
+		// make a unit vector pointing from the control point of the previous curve to the start point of this curve.
+		let prevToStart = [startPoint[0] - prevCtrl[0], startPoint[1] - prevCtrl[1]];
+		let magnitude = Util.getDist(prevCtrl, startPoint);
+		prevToStart[0] /= magnitude
+		prevToStart[1] /= magnitude;
+		// make a new point specifying the cartesian coordinates of a random point in the direction of the previously calculated unit vector within 
+		// this.vecRad px of the start point:
+		let ctrlPoint = [];
+		let newMag = Util.getRandomIntInRange(OrbitPlanner.CURVINESS[0], OrbitPlanner.CURVINESS[1]);
+		ctrlPoint.push(((prevToStart[0] * newMag) + startPoint[0]) << 0);
+		ctrlPoint.push(((prevToStart[1] * newMag) + startPoint[1]) << 0);
+		return ctrlPoint;
+	}
+
+	getSecondCtrlPoint(startPoint, firstCtrl, endPoint){
+		// find the vector going from the first control point to the end point:
+		let firstToEnd = [endPoint[0] - firstCtrl[0], endPoint[1] - firstCtrl[1]];
+		// find the length of that vector:
+		let lengthFTE = Util.getDist([0,0], firstToEnd);
+		// find both unit vectors perpendicular to first to end:
+		let perp = Util.normalizeVector(firstToEnd);
+		let perp1 = Util.rotateVector(perp, Math.PI / 2);
+		let perp2 = Util.flipVector(perp1);
+		// find the midpoint between the first control point and the end point:
+		let midPoint = [(firstCtrl[0] + endPoint[0]) / 2, (firstCtrl[1] + endPoint[1]) / 2]
+		// find the vector going from the start point to the mid point:
+		let midToStart = [startPoint[0] - midPoint[0], startPoint[1] - midPoint[1]];
+		// we want to select the vector perpendicular to firstToEnd that has the shallowest angle with startToMid
+		perp = Util.getAngle(perp1, midToStart) > Util.getAngle(perp2, midToStart) ? perp1 : perp2;
+		// choose some random length for our final vector
+		let mag = Util.getRandomIntInRange(lengthFTE * OrbitPlanner.CURVE_FACTOR[0], lengthFTE * OrbitPlanner.CURVE_FACTOR[1]);
+		// choose a point along t * perp, mag away form the mid point between the first control point and the end point
+		let secondCtrl = [midPoint[0] + (perp[0] * mag) << 0, midPoint[1] + (perp[1] * mag) << 0];
+		return secondCtrl;
+	}
+
+		
+	// evacuate all orbiters from the screen:
+	evacuateAll(){
+		let self = this;
+		for(let id of this.ids.keys()){
+			try{
+				var orbiter = document.getElementById(id);
+				let rect = orbiter.getBoundingClientRect();
+				this.evacuate(orbiter, [rect.left, rect.top]);
+			} catch(error){
+				continue;
 			}
 		}
-	} else {
-		throw "No corresponding ids found in the id map";
 	}
-	// make a point to end at (don't be confused as to the name. It will make sense later):
-	var startPoint = getRandomPoint(dropInPoint);
-	// make a random first control point:
-	var firstCtrl = getFirstCtrlPoint(getRandomPoint(dropInPoint), dropInPoint);
-	// make a second control point (once again, the name will make sense later):
-	var prevCtrl = getSecondCtrlPoint(dropInPoint, firstCtrl, startPoint); 
-	// these guys will be used later. Keep them null for now though:
-	var ctrlPoint2, ctrolPoint1, endPoint;
-	// start making a new rule:
-	var rule = "." + id + "{cursor: pointer; background: " + ids.get(id) + "; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
-				"top:0px; left: 0px; z-index: 20; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
-				firstCtrl[1] + " " + prevCtrl[0] + " " + prevCtrl[1] + " " + startPoint[0] + " " + startPoint[1];
-	// make between 7 and 15 svg bezier curve paths:
-	var iterations = getRandomIntInRange(7, 15);
-	for(var i = 0; i < iterations; i++){
-		// get a control point that is colinear with the startpoint and the last control point:
-		ctrlPoint1 = getFirstCtrlPoint(prevCtrl, startPoint);
-		// generate a random end point that is at least 500 px away from the starting point:
-		endPoint = getRandomPoint(startPoint);
-		ctrlPoint2 = getSecondCtrlPoint(startPoint, ctrlPoint1, endPoint);
-		//ctrlPoint2 = getRandomPoint(startPoint);
-		// append the curve to our rule:
-		rule += (" C " + ctrlPoint1[0] + " " + ctrlPoint1[1] + " " + ctrlPoint2[0] + " " + ctrlPoint2[1] + " " + endPoint[0] + " " + endPoint[1]);
-		// update prevCtrl and startPoint for next iteration:
-		prevCtrl = ctrlPoint2;
-		startPoint = endPoint;
+
+	// make block with given ID run very far very quickly.
+	evacuate(orbiter, dropInPoint){
+		this.orbiting.delete(orbiter.id);
+		orbiter.remove();
+		let runner = document.createElement("div")
+		runner.id = "runner";
+		runner.style = this.getRunStyle(dropInPoint, this.ids.get(orbiter.id));
+		//setInterval(() => {.remove();}, OrbitPlanner.EVACUATE_TIME * 1000);
+		runner.addEventListener("animationend", () => {
+				runner.remove();
+			}
+		);
+		clearInterval(this.intervals.get(orbiter.id));
+		/*let makeBloop = this.makeBloop.bind(this);
+		let int = setInterval(makeBloop, OrbitPlanner.BLOOP_REFRESH_INTERVAL, runner);
+		this.intervals.set(id, int);*/
+		document.body.appendChild(runner);
 	}
-	// add a final destination offscreen:
-	ctrlPoint1 = getFirstCtrlPoint(prevCtrl, startPoint);
-	endPoint = getOffScreenPoint();
-	ctrlPoint2 = getSecondCtrlPoint(startPoint, ctrlPoint1, endPoint);
-	rule += (" C " + ctrlPoint1[0] + " " + ctrlPoint1[1] + " " + ctrlPoint2[0] + " " + ctrlPoint2[1] + " " + endPoint[0] + " " + endPoint[1]);
-	// append all this gibberish to complete a pretty pretty pretty animation rule:
-	rule += "'); offset-distance: 0%; animation: orbit; animation: orbit " + iterations * secsPerSegment + "s linear infinite; animation-fill-mode: forwards;}";
-	console.log(rule);
-	return rule;
-}
 
-function getFirstCtrlPoint(prevCtrl, startPoint){
-	// make a unit vector pointing from the control point of the previous curve to the start point of this curve.
-	var prevToStart = new Array(startPoint[0] - prevCtrl[0], startPoint[1] - prevCtrl[1]);
-	var magnitude = getDist(prevCtrl, startPoint);
-	prevToStart[0] /= magnitude
-	prevToStart[1] /= magnitude;
-	// make a new point specifying the cartesian coordinates of a random point in the direction of the previously calculated unit vector within 
-	// 500 px of the start point:
-	var ctrlPoint = new Array();
-	var newMag = getRandomIntInRange(300, 500);
-	ctrlPoint.push(((prevToStart[0] * newMag) + startPoint[0]) << 0);
-	ctrlPoint.push(((prevToStart[1] * newMag) + startPoint[1]) << 0);
-	return ctrlPoint;
-}
-
-function getSecondCtrlPoint(startPoint, firstCtrl, endPoint){
-	// find the vector going from the first control point to the end point:
-	var firstToEnd = [endPoint[0] - firstCtrl[0], endPoint[1] - firstCtrl[1]];
-	// find the length of that vector:
-	var lengthFTE = getDist([0,0], firstToEnd);
-	// find both unit vectors perpendicular to first to end:
-	var perp = normalizeVector(firstToEnd);
-	var perp1 = rotateVector(perp, Math.PI / 2);
-	var perp2 = flipVector(perp1);
-	// find the midpoint between the first control point and the end point:
-	var midPoint = [(firstCtrl[0] + endPoint[0]) / 2, (firstCtrl[1] + endPoint[1]) / 2]
-	// find the vector going from the start point to the mid point:
-	var midToStart = [startPoint[0] - midPoint[0], startPoint[1] - midPoint[1]];
-	// we want to select the vector perpendicular to firstToEnd that has the shallowest angle with startToMid
-	perp = getAngle(perp1, midToStart) > getAngle(perp2, midToStart) ? perp1 : perp2;
-	// choose some random length for our final vector
-	var mag = getRandomIntInRange(lengthFTE * 0.5, lengthFTE * 0.75);
-	// choose a point along t * perp, mag away form the mid point between the first control point and the end point
-	var secondCtrl = [midPoint[0] + (perp[0] * mag) << 0, midPoint[1] + (perp[1] * mag) << 0];
-	return secondCtrl;
-}
-
-function getEndPoint(startPoint, firstCtrl){
-	var givenVec = [firstCtrl[0] - startPoint[0], firstCtrl[1] - startPoint[1]];
-	var perp = rotateVector(givenVec, Math.PI / 2);
-	perp = normalizeVector(perp);
-	var minMax = getMinMaxScalar(startPoint, perp);
-	var mag = Math.abs(minMax[0]) > Math.abs(minMax[1]) ? getRandomIntInRange((minMax[0] * 0.75) << 0, minMax[0]) : getRandomIntInRange((minMax[1] * 0.75) << 0, minMax[1]);
-	var midPoint = [(startPoint[0] + firstCtrl[0]) / 2, (startPoint[1] + firstCtrl[1]) / 2];
-	var endPoint = new Array();
-	endPoint.push((perp[0] * mag << 0) + midPoint[0]);
-	endPoint.push((perp[1] * mag << 0) + midPoint[1]);
-	return endPoint;
-}
-
-// returns an array with two elements: the largest and smallest a scalar can be and still point at a coordinate pair on screen.
-function getMinMaxScalar(startPoint, unitVec){
-	// evaluate left bound:
-	var leftBound = unitVec[0] == 0 ? Number.MAX_VALUE : (-1 * startPoint[0]) / unitVec[0];
-	var rightBound = unitVec[0] == 0 ? Number.MAX_VALUE :(window.innerWidth - blockWidth - startPoint[0]) / unitVec[0];
-	var topBound = unitVec[1] == 0 ? Number.MAX_VALUE : (-1 * startPoint[1]) / unitVec[1];
-	var bottomBound = unitVec[1] == 0 ? Number.MAX_VALUE : (window.innerHeight - blockHeight - startPoint[1]) / unitVec[1];
-	var directions = [[leftBound, topBound], [rightBound, topBound], [bottomBound, leftBound], [bottomBound, rightBound]];
-	directions.sort(function(a,b){return Math.min(a[0], a[1]) - Math.min(b[0], b[1])})
-	var min = Math.min(directions[0][0], directions[0][1]);
-	var max = Math.min(directions[directions.length - 1][0], directions[directions.length - 1][1]);
-	return [min << 0, max << 0];
-}
-
-
-// use the dot product cosine rule to get the angle between two vectors: dot(a,b) = magnitude(a) * magnitude(b) * cos(theta). Solve for theta.
-function getAngle(vecA, vecB){
-	var dot = (vecA[0] * vecB[0]) + (vecA[1] * vecB[1]);
-	var magA = getDist([0,0], vecA);
-	var magB = getDist([0,0], vecB);
-	return Math.acos(dot / (magA * magB));
-}
-
-// rotate vec by theta degrees preserving its magnitude
-function rotateVector(vec, theta){
-	var xcomponent = (vec[0] * Math.cos(theta)) - (vec[1] * Math.sin(theta));
-	var ycomponent = (vec[0] * Math.sin(theta)) + (vec[1] * Math.cos(theta));
-	return new Array(xcomponent, ycomponent);
-}
-
-// shorten/lengthen vec to have a magnitude of 1
-function normalizeVector(vec){
-	var mag = getDist(new Array(0,0), vec);
-	return mag == 0 ? [0, 0] : [vec[0] / mag, vec[1] / mag];
-}
-
-// make vec point in the opposite direction.
-function flipVector(vec){
-	return new Array(vec[0] * -1, vec[1] * -1);
-}
-
-// show where vec points to if it starts at startPoint
-function getVectorEndPoint(startPoint, vec){
-	return new Array(vec[0] + startPoint[0], vec[1] + startPoint[1]);
-}
-
-//get a random point where a block could be visible on screen.
-function getRandomPoint(startPoint = null){
-	var endPoint = new Array(getRandomIntInRange(0, window.innerWidth - 150), getRandomIntInRange(0, window.innerHeight - 150))
-	if(startPoint != null){
-		while(getDist(startPoint, endPoint) < 500){
-			endPoint[0] = getRandomIntInRange(0, window.innerWidth - 150);
-			endPoint[1] = getRandomIntInRange(0, window.innerHeight - 150);
-		}
+	// make a style string that will make the orbiter fly off screen
+	getRunStyle(dropInPoint, color){
+		let endPoint = Util.getFurthestOffScreenPoint(dropInPoint);
+		let firstCtrl = this.getFirstCtrlPoint(Util.getRandomPoint(dropInPoint, this.vecRad), dropInPoint);
+		let secondCtrl = this.getSecondCtrlPoint(dropInPoint, firstCtrl, endPoint);
+		let cmd = "background: " + color + "; position: absolute; border-radius: 0%; height: " + OrbitPlanner.ORBITER_HEIGHT + "px; width: " + OrbitPlanner.ORBITER_WIDTH + "px;" +
+					"top:0px; left: 0px; z-index: 1; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
+					firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
+					"'); offset-distance: 0%; animation: orbit " + OrbitPlanner.EVACUATE_TIME + "s linear; animation-fill-mode: forwards;";
+		return cmd;
 	}
-	return endPoint;
-}
-
-// get the distance between two points
-function getDist(p1, p2){
-	// distance formula: L = sqrt((x1-x2)^2 + (y1-y2)^2)
-	return Math.sqrt(Math.pow(p1[0] - p2[0], 2) + Math.pow(p1[1] - p2[1], 2)) << 0;
-}
-
-function getRandomIntInRange(first, second){
-	var a = Math.min(first, second), b = Math.max(first, second);
-	return (((b - a) * Math.random()) + a) << 0
-}
-function getOffScreenPoint(){
-	var rand = Math.random();
-	if(rand >= 0.75){
-		return new Array(-200,-200);
-	}
-	else if(rand >= 0.50){
-		return new Array(-200, window.innerHeight + 200);
-	}
-	else if(rand >= 0.25){
-		return new Array(window.innerWidth + 200, -200);
-	} else {
-		return new Array(window.innerWidth + 200, window.innerHeight + 200);
-	}
-}
-
-function getFurthestOffScreenPoint(currPoint){
-	var midPoint = [window.innerWidth / 2, window.innerHeight / 2];
-	if((currPoint[0] < midPoint[0]) && (currPoint[1] < midPoint[1])){
-		return [window.innerWidth + 200, window.innerHeight + 200];
-	} 
-	else if((currPoint[0] < midPoint[0]) && (currPoint[1] > midPoint[1])){
-		return [window.innerWidth + 200, - 200];
-	} 
-	else if((currPoint[0] > midPoint[0]) && (currPoint[1] > midPoint[1])){
-		return [-200, -200];
-	} 
-	return 	[-200, window.innerHeight + 200]
-}
-	
-
-function evacuateAll(){
-	for(let id of ids.keys()){
-		var orbiter = document.getElementById(id);
-		var rect = orbiter.getBoundingClientRect();
-		orbiter.setAttribute("class", "runner")
-		orbiter.style.top = "500px";
-		orbiter.style.left = "500px";
-		setTimeout(() => {orbiter.style.top = rect.top + "px"; orbiter.style.left = rect.left + "px"}, 50)
-		setTimeout(evacuate, 70, id, [rect.left, rect.top])
-	}
-}
-
-// make block with given ID run very far very quickly.
-function evacuate(id, dropInPoint){
-	var orbiter = document.getElementById(id);
-	for(var i = 0; i < orbiter.classList.length; i++){
-		orbiter.classList.remove(orbiter.classList[i]);
-	}
-	orbiter.style = getRunStyle(dropInPoint, ids.get(id));
-	orbiter.addEventListener("animationend", e => {document.getElementById("bodies").removeChild(e.currentTarget)})
-}
-
-function getRunStyle(dropInPoint, color){
-	var endPoint = getFurthestOffScreenPoint(dropInPoint);
-	var firstCtrl = getFirstCtrlPoint(getRandomPoint(dropInPoint), dropInPoint);
-	var secondCtrl = getSecondCtrlPoint(dropInPoint, firstCtrl, endPoint);
-	var cmd = "background: " + color + "; position: absolute; border-radius: 0%; height: 150px; width: 150px;" +
-				"top:0px; left: 0px; z-index: 1; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
-				firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
-				"'); offset-distance: 0%; animation: orbit " + evacuateTime + "s linear; animation-fill-mode: forwards;";
-	return cmd;
 }

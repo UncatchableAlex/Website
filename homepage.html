@@ -2,15 +2,25 @@
 <html>
 	<head>
 		<title>Alex Website Beta</title>
+		<!-- load CSS: -->
 		<link rel = "stylesheet" href = "Website_Code/CSS/Style_Sheet.css">
+
+		<!-- load favicon: -->
 		<link rel='shortcut icon' type='image/x-icon' href='favicon.ico' />
+
+		<!-- load JavaScript: -->
+		<script src = Website_Code/JS/Util.js></script>
 		<script src = Website_Code/JS/OrbitPlanner.js></script>
 		<script src = Website_Code/JS/MouseTranslator.js></script>
-		<script src = Website_Code/JS/ExpressionBuilderJSNative.js></script>
 		<script src = Website_Code/JS/ConsoleCreator.js></script>
+		<script src = Website_Code/JS/Credits.js></script>
+		<script src = Website_Code/JS/About.js></script>
+		<script src = Website_Code/JS/ExpressionBuilderJSNative.js></script>
 		<script src = Website_Code/JS/Pathfinder.js></script>
 		<script src = Website_Code/JS/Queue.js></script>
 		<script src = Website_Code/JS/GameOfLife.js></script>
+
+
 		<!-- Global site tag (gtag.js) - Google Analytics -->
 		<script async src="https://www.googletagmanager.com/gtag/js?id=UA-180653985-1"></script>
 		<script>
@@ -21,12 +31,38 @@
 		  gtag('config', 'UA-180653985-1');
 		</script>
 		<!--End Google cite tag-->
+
+
+		<!-- "main method" of sorts: -->
 		<script>
+			"use strict";
+			var orbitPlanner;
+			var mouseTranslator;
+			var windowResize = -1;
+			var delayOnResize = 500;
 			function onloadSeq(){
 				localStorage.clear();
-				makeOrbiters();
-				document.getElementById("background").addEventListener("click", receiveBgroundClick);
+				orbitPlanner = new OrbitPlanner();
+				orbitPlanner.makeOrbiters();
+				document.getElementById("background").addEventListener("click", () => {
+						try{
+							orbitPlanner.consoleCreator.closeConsole();
+						} catch(noPanelOpen){
+							//ignore
+						}
+					}
+				);
 				window.addEventListener("resize", windowResizeDone);
+			}
+
+			// if the user resizes the window, repath all of the blocks. The repathing will go into effect after 
+			//delayOnResize milliseconds of no additional resize adjustments:
+			function windowResizeDone(){
+				clearTimeout(windowResize);
+				orbitPlanner.evacuateAll();
+				setTimeout( () => {
+					orbitPlanner.makeOrbiters();
+				}, orbitPlanner.bloopDuration * 1.5);
 			}
 		</script>
 	</head>

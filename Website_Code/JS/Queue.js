@@ -1,3 +1,4 @@
+"use strict";
 function QueueNode(data){
 	this.data = data;
 	this.next;
@@ -25,7 +26,7 @@ Queue.prototype.poll = function(data){
 	if(this.length == 0){
 		throw "Queue is empty. Can't poll";
 	}
-	oldHead = this.head;
+	let oldHead = this.head;
 	this.head = oldHead.next;
 	this.length--;
 	return oldHead.data;
