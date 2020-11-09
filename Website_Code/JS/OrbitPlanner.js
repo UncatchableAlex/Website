@@ -2,6 +2,9 @@
 class OrbitPlanner{
 	static IDS_GENERIC = new Map([["expBuild", "red"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["gameOfLife", "darkviolet"]]);
 	static BLOOP_REFRESH_INTERVAL = 80;
+	static BLOOP_DURATION = 2.5;
+	static BLOOP_SIZE = 7;
+	static BLOOP_COLOR = "lime";
 	static ORBITER_WIDTH = 150;
 	static ORBITER_HEIGHT = 150;
 	static EVACUATE_TIME = 0.6;
@@ -82,7 +85,7 @@ class OrbitPlanner{
 		// fancy divide by 2 (bitshift):
 		let left = (rect.left + rect.right) >> 1;
 		let top = (rect.top + rect.bottom) >> 1;
-		let b = new Bloop(left, top, 7, 2.5, this.canvas, "lime");
+		let b = new Bloop(left, top, OrbitPlanner.BLOOP_SIZE, OrbitPlanner.BLOOP_DURATION, this.canvas, OrbitPlanner.BLOOP_COLOR);
 		b.init();
 	}
 
