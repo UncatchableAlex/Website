@@ -126,7 +126,7 @@ class GameOfLife extends Console{
 
 
 		// the canvas that this game of life will paint to:
-		this.canvas = this.makeCanvas(canvasId, 0, 0, numCellsAcross * 4, numCellsAcross * 3);
+		this.canvas = this.makeCanvas(canvasId, 0, 0, numCellsAcross * 10, numCellsAcross * 7);
 
 		if(this.canvas.width % numCellsAcross != 0){
 			throw "cells across isn't a factor of width";
@@ -340,7 +340,7 @@ class GameOfLife extends Console{
 	    let self = this;
 
 	    // add an event listener to the canvas for placing the selected 
-	    this.canvas.addEventListener("click", function(e){self.placePattern(e, self.currPattern)})
+	    this.canvas.addEventListener("click", (e) => {self.placePattern(e, self.currPattern)})
 
 	    // add a user-selectable tile for each pattern option:
 	    for(let i = 0; i < this.patternList.length; i++){
@@ -384,7 +384,7 @@ class GameOfLife extends Console{
 	  	}
 		golConsole.appendChild(goButton);
 
-		// make a slider for controlling the speed:
+		// make a slider for controlling the speed of the animation:
 		let slider = document.createElement("input");
 		slider.style = "width: 15%; height: 5%; top: 7%; left: 40%;";
 		slider.type = "range";
@@ -399,7 +399,7 @@ class GameOfLife extends Console{
 	       		if(self.tickInterval != null){
 	          		clearInterval(self.tickInterval);
 	        	}
-	      		self.tickInterval = setInterval(function(){self.tick();}, self.tickPeriod);
+	      		self.tickInterval = setInterval(() => {self.tick();}, self.tickPeriod);
 	    	}
 	    }
 		golConsole.appendChild(slider);
@@ -409,7 +409,7 @@ class GameOfLife extends Console{
 
 		// make a button that will increment the frame by one tick:
 	  	let tickButton = document.createElement("button");
-	  	tickButton.innerHTML = "Tick!";
+	  	tickButton.innerHTML = "TICK!";
 	  	tickButton.style = "left: 59%; top: 10%; height: 5%; width: 7%; background: gold; border: 2px solid black; font-size: 2.3vh";
 	  	tickButton.onclick = function(){self.tick();}
 	  	golConsole.appendChild(tickButton);
@@ -425,15 +425,11 @@ class GameOfLife extends Console{
 
 	  	// give the demo a description:
 	  	let desc = document.createElement("p"); 
-	  	desc.innerHTML = /*"Welcome to John Conway's " + super.italicize("Game of Life") + ". Back in his time, the only way to play this game was with " +
-	  					"a Go set and a massive amount of patience. After computers came along, this game became significantly easier to play, but still, " +
-	  					"something was missing. There was no easy way to keep track of which cells to kill each turn and which ones to ressurect. Enter the " +
-	  					"hashset&emdash;A datastructure made of pure magic. "*/
-
-	  	"This demonstration is based off of John Conway's " + super.italicize("Game of Life") + " but with a colorful twist. To the left there is a board" +
-	  	" consisting of many \"dead\" cells in a large grid. The rules are simple: <br><br> 1.) Every turn, a dead cell will become alive if three of its eight neighbors are alive " +
-	  	"<br>2.) Every turn, a live cell will die if more than three or fewer than two of its neighbors are alive. <br><br> To start, please select a tile from along the top bar of the left canvas " +
-	  	" (its border will become dark when selected) and click on the canvas to place it. Click \"GO!\" to start the simulation and use the slider to control the speed. Good luck!";
+	  	desc.innerHTML = 
+			  	"This demonstration is based off of John Conway's " + super.italicize("Game of Life") + " but with a colorful twist. To the left there is a board" +
+			  	" consisting of many \"dead\" cells in a large grid. The rules are simple: <br><br> 1.) Every turn, a dead cell will become alive if three of its eight neighbors are alive " +
+			  	"<br>2.) Every turn, a live cell will die if more than three or fewer than two of its neighbors are alive. <br><br> To start, please select a tile from along the top bar of the left canvas " +
+			  	" (its border will become dark when selected) and click on the canvas to place it. Click \"GO!\" to start the simulation and use the slider to control the speed. Good luck!";
 	  	desc.style.height = "80%";
 	  	desc.style.top = "12%";
 	  	desc.style.width = "90%";
@@ -512,7 +508,7 @@ Cell.prototype.setRGB = function(){
 	this.dist = this.parent.dist + 1;
 
 	// find the rgb using oscillating trig functions. The point is to zig-zag through the color spectrum as wildly as possible.
-	// (When graphed in 3d, this parametrized function looks a bit like a half-slinky from hell. It's kind of neat):
+	// (When graphed in 3d, this parametrized function looks a bit like a very bunched up half slinky. It's kind of neat):
 	this.rgb = [
 		Math.abs(255 * Math.cos(theta)) << 0, 
 		Math.abs(255 * Math.sin(theta)) << 0, 

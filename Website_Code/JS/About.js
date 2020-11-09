@@ -34,10 +34,10 @@ class About extends Console{
 
 
 			"Finally, it was necessary to find the rotation of a block, mid animation, for when the user attempts to pick it up. I initially" +
-			" tried solving this problem geometrically by inferring rotation from the blocks bounding rectangle. " +
-			"Unfortunately, there are always two acceptable orientations, either of which could be incorrect. My current " +
-			"strategy is to wait for two frames and calculate the inverse tangent of its motion's slope. This strategy works because the " +
-			"block's forward-facing side is always perpendicular to its velocity.<br><br>" +
+			" tried solving this problem geometrically by inferring rotation from a block's bounding rectangle. " +
+			"Unfortunately, there were always two acceptable orientations, either of which could be incorrect. My current " +
+			"strategy is to wait for two frames and calculate the inverse tangent of the block's motion. This strategy works because the " +
+			"forward-facing side is always perpendicular to the block's velocity.<br><br>" +
 
 			"Going forward, I expect to focus mainly on formatting and compatibility issues, assuming no major bugs reveal themselves.";
 		desc.style.top = "16%";

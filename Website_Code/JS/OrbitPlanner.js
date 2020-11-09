@@ -12,13 +12,15 @@ class OrbitPlanner{
 	static VEC_RAD_FLOOR = 500;
 	static SPEED_MULTIPLIER = 6;
 
-	constructor(concurrentAllowed = false, ids = OrbitPlanner.IDS_GENERIC, consoleCreator = null, mouseTranslator = new MouseTranslator(), styleSheet = null){
+	constructor(ids = OrbitPlanner.IDS_GENERIC, concurrentAllowed = false, consoleCreator = new ConsoleCreator(this), mouseTranslator = new MouseTranslator(), 
+				styleSheet = null, canvas = document.querySelector("#background")){
 		this.concurrentAllowed = concurrentAllowed;
 		this.bloopNum;
 		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_MULTIPLIER;
 		this.rules;
 		this.intervals = new Map();
 		this.orbiting = new Set();
+		this.canvas = canvas;
 
 		try{
 			this.styleSheet = styleSheet == null ? document.styleSheets[0] : styleSheet;
@@ -31,7 +33,7 @@ class OrbitPlanner{
 		} catch(error){
 			throw "StyleSheetException: Stylesheet must have .bloop class with animation duration attribute."
 		}
-		this.consoleCreator = new ConsoleCreator(this);
+		this.consoleCreator = consoleCreator;
 		this.ids = ids;
 		this.mouseTranslator = mouseTranslator;
 		this.vecRad = Math.min(OrbitPlanner.VEC_RAD_FLOOR, window.innerWidth / 3);
@@ -75,28 +77,13 @@ class OrbitPlanner{
 
 
 	makeBloop(orbiter){
-		let self = this;
-		if(orbiter == null){
-			return;
-		}
-		this.bloopNum = (this.bloopNum < 2000000) ? ++this.bloopNum : 0;
 		let rect = orbiter.getBoundingClientRect();
+
 		// fancy divide by 2 (bitshift):
 		let left = (rect.left + rect.right) >> 1;
 		let top = (rect.top + rect.bottom) >> 1;
-		let bloop = document.createElement("div");
-		bloop.setAttribute("class", "bloop");
-		bloop.id =  "bloop" + this.bloopNum;
-		bloop.style = "top: " + top + "px; left: " + left + "px;";
-		bloop.setAttribute("data", orbiter.id);
-		document.getElementById("bloops").appendChild(bloop);
-		setTimeout( () => {
-			try{
-				bloop.remove();
-			} catch(error){
-				//bloop already removed. ignore.
-			}
-		}, this.bloopDuration);
+		let b = new Bloop(left, top, 7, 2.5, this.canvas, "lime");
+		b.init();
 	}
 
 	makeRule(id, dropInPoint){
@@ -192,22 +179,16 @@ class OrbitPlanner{
 		}
 	}
 
-	// make block with given ID run very far very quickly.
+	// make block with given ID run very far, very quickly.
 	evacuate(orbiter, dropInPoint){
 		this.orbiting.delete(orbiter.id);
 		orbiter.remove();
 		let runner = document.createElement("div")
 		runner.id = "runner";
 		runner.style = this.getRunStyle(dropInPoint, this.ids.get(orbiter.id));
-		//setInterval(() => {.remove();}, OrbitPlanner.EVACUATE_TIME * 1000);
-		runner.addEventListener("animationend", () => {
-				runner.remove();
-			}
-		);
+		setInterval(() => {runner.remove();}, OrbitPlanner.EVACUATE_TIME * 1000);
+
 		clearInterval(this.intervals.get(orbiter.id));
-		/*let makeBloop = this.makeBloop.bind(this);
-		let int = setInterval(makeBloop, OrbitPlanner.BLOOP_REFRESH_INTERVAL, runner);
-		this.intervals.set(id, int);*/
 		document.body.appendChild(runner);
 	}
 
@@ -221,5 +202,67 @@ class OrbitPlanner{
 					firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
 					"'); offset-distance: 0%; animation: orbit " + OrbitPlanner.EVACUATE_TIME + "s linear; animation-fill-mode: forwards;";
 		return cmd;
+	}
+}
+
+class Bloop{
+
+	constructor(x, y, size, duration, canvas, rgb, orbiter){
+		this.x = x;
+		this.y = y;
+		this.size = size;
+		this.duration = duration;
+		this.age = 1;
+		this.ctx = canvas.getContext("2d");
+		this.canvasColor = window.getComputedStyle(canvas).getPropertyValue("background-color")
+		this.rgb = rgb;
+		this.keepDrawing = true;
+		this.secsElapsed = 0;
+		this.prevTime;
+	}
+
+	init(){
+		let drawBloop = this.drawBloop.bind(this);
+		requestAnimationFrame(drawBloop);
+	}
+
+	drawBloop(currentTime){
+		let size = this.getSize(this.secsElapsed);
+		if(!this.keepDrawing || size <= 0){
+			return;
+		}
+
+		this.ctx.beginPath();
+		this.ctx.fillStyle = this.canvasColor
+		this.ctx.arc(this.x, this.y, size + 1, 0, Math.PI * 2, true);
+		this.ctx.fill();
+
+		this.secsElapsed += (this.prevTime == null ? 0 : ((currentTime - this.prevTime) / 1000));
+		this.prevTime = currentTime;
+		size = this.getSize(this.secsElapsed);
+
+		if(size <= 0){
+			return;
+		}
+
+		this.ctx.beginPath();	
+		this.ctx.fillStyle = this.rgb
+		this.ctx.arc(this.x, this.y, this.getSize(this.secsElapsed), 0, Math.PI * 2);
+		this.ctx.fill();
+
+		let drawBloop = this.drawBloop.bind(this);
+		requestAnimationFrame(drawBloop);
+	}
+
+	stopDrawing(){
+		this.keepDrawing = false;
+	}
+
+	getSize(secsElapsed){
+		secsElapsed += 0.01;
+		let a = (this.size * secsElapsed * 2 / this.duration);
+		a = isNaN(a) ? 0 : a;
+		let ans = (-1 * Math.abs(a - this.size)) + this.size;
+		return ans;
 	}
 }

@@ -45,6 +45,9 @@
 			var windowResize = -1;
 			var delayOnResize = 500;
 			function onloadSeq(){
+				let bg = document.getElementById("background");
+				bg.width = window.innerWidth;
+				bg.height = window.innerHeight;
 				localStorage.clear();
 				orbitPlanner = new OrbitPlanner();
 				orbitPlanner.makeOrbiters();
@@ -62,6 +65,9 @@
 			// if the user resizes the window, repath all of the blocks. The repathing will go into effect after 
 			//delayOnResize milliseconds of no additional resize adjustments:
 			function windowResizeDone(){
+				let bg = document.getElementById("background");
+				bg.width = window.innerWidth;
+				bg.height = window.innerHeight;
 				if(orbitPlanner.consoleCreator.evacuated == true){
 					return;
 				}
@@ -74,13 +80,11 @@
 		</script>
 	</head>
 	<body onload = "onloadSeq();">
-		<h1>Alex's Demos</h1>
-		<section id="bodies">
-			<section id="bloops"></section>
-			<section>
-				<div id="background" class="wholeScreen"></div>
+			<canvas id="background" class="background"></canvas>
+			<h1>Alex's Demos</h1>
+			<section id="bodies">
+				<section id="bloops"></section>
 			</section>
-		</section>
-		<div id = "receptacle" class = "receptacle"> Drag Block Here</div>
+			<div id="receptacle" class="receptacle"> Drag Block Here</div>
 	</body>
 </html>
