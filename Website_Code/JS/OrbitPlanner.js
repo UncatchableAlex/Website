@@ -30,12 +30,6 @@ class OrbitPlanner{
 		} catch(error){
 			throw "StyleSheetException: Declare or pass stylesheet first";
 		}
-		try{
-			let bloopDurationStr = Util.getCssRule(this.styleSheet, ".bloop").style.animationDuration;
-			this.bloopDuration = parseFloat(bloopDurationStr.substring(0, bloopDurationStr.length - 1)) * 1000;
-		} catch(error){
-			throw "StyleSheetException: Stylesheet must have .bloop class with animation duration attribute."
-		}
 		this.consoleCreator = consoleCreator;
 		this.ids = ids;
 		this.mouseTranslator = mouseTranslator;

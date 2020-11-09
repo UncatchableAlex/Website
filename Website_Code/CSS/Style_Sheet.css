@@ -130,18 +130,6 @@
 				height: 150px;
 				width: 150px;
 			}
-			.bloop{
-				background: lime;
-				position: absolute;
-				border-radius: 100%;
-				z-index: 0;
-				height: 10px;
-				width: 10px;
-				animation-name: shrink;
-				animation-duration: 2.5s;
-				animation-timing-function: linear;
-				animation-fill-mode: forwards;
-			}
 			.answerDisplay{
 				font-size: 1.4vw;
 				text-align: center;

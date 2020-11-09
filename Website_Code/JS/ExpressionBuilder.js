@@ -25,6 +25,9 @@ class ExpressionBuilder extends Console{
         }
         target = parseInt(target);
         params = params.replace(" ", "").split(",");
+        while(params[params.length - 1] == ""){
+            params.pop();
+        }
         if(params.length > 7 && message == null){
             let ui = confirm("You have entered " + params.length + " numbers. Be aware " +
                 "that this may cause the tab to freeze for a long period or crash. " +
