@@ -24,9 +24,12 @@ class ExpressionBuilder extends Console{
             message = "Incorrect formatting in the params field.";
         }
         target = parseInt(target);
-        params = params.replace(" ", "").split(",");
-        while(params[params.length - 1] == ""){
+        params = params.replaceAll(" ", "").replaceAll(/[,]+/g, ",").split(",");
+        if(params[params.length - 1] == ""){
             params.pop();
+        }
+        if(params[0] == ""){
+            params.shift();
         }
         if(params.length > 7 && message == null){
             let ui = confirm("You have entered " + params.length + " numbers. Be aware " +
@@ -35,6 +38,12 @@ class ExpressionBuilder extends Console{
             if(!ui){
                 message = "Enter fewer numbers this time!     :)";
             }
+        }
+        if(params.length == 0){
+            message = "Params field is blank";
+        }
+        if(target.toString().length == 0){
+            message = "Target field is blank";
         }
         if(target < 0 && message == null){
             message = "Target must be greater than zero.";
