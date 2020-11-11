@@ -48,31 +48,47 @@ class ExpressionBuilder extends Console{
         if(target < 0 && message == null){
             message = "Target must be greater than zero.";
         }
-        if(params.length == 1 && params[0] == target){
-            message = params[0] + " = " + target;
-        }
         let nums = new Array();
         params.forEach(num => nums.push(parseInt(num)));
-        let newDiv = document.createElement("div")
+        var newDiv = document.createElement("div")
         newDiv.id = "answer";
+        try{
+            var answerDisplay = document.getElementById("answerDisplay");
+        } catch(error){
+            throw "Console must be rendered before expressionBuilder can be run";
+        }
         if(message != null){
             newDiv.innerHTML = message;
-            document.getElementById("answerDisplay").appendChild(newDiv);
+            answerDisplay.appendChild(newDiv);
             return;
         }
-        document.getElementById("bloops").innerHTML = "";
         this.consoleCreator.orbitPlanner.evacuateAll();
+        if(params.length > 6){
+            var evacTime = Bloop.DURATION * 1050;
+        } else {
+            var evacTime = OrbitPlanner.EVACUATE_TIME * 1500;
+        }
         setTimeout(
-                () => {
-                    newDiv.innerHTML = this.buildExpression(nums, target);
-                    document.getElementById("answerDisplay").appendChild(newDiv);
-                    this.consoleCreator.orbitPlanner.makeOrbiters();
-                }, OrbitPlanner.EVACUATE_TIME * 1500);
+                    () => {
+                        let ans = this.buildExpression(nums, target);
+                        if(ans.length > 56){
+                            newDiv.style.fontSize = "1vw";
+                        }
+                        newDiv.innerHTML = ans;
+                        answerDisplay.appendChild(newDiv);
+                        this.consoleCreator.orbitPlanner.makeOrbiters();
+                    }, evacTime
+                );
     }
 
     buildExpression(list, target){
         let res = this.buildExpressionHelper(list, target);
-        return res == null ? " No solution found. Try " + this.closest + " as a target instead. " : res.slice(1, res.length - 1) + " = " + target; 
+        if(res == null){
+            res = " No solution found. Try " + this.closest + " as a target instead. "
+        } else {
+            res = res.replaceAll(/^[(]|[)]$/g, "") + " = " + target;
+        }
+        return res;
     }
 
     buildExpressionHelper(list, target){
@@ -156,9 +172,9 @@ class ExpressionBuilder extends Console{
         const strNtr = numToReplace.toString();
         const  insertExp = "(" + first + " " + op + " " + second + ")";
         for(let i = strNtr.length; i <= curr.length; i++){
-            const frame = curr.substring(i - strNtr.length, i); 
+            let frame = curr.substring(i - strNtr.length, i); 
             if(frame == strNtr){
-                const nextChar = curr.charAt(i);
+                let nextChar = curr.charAt(i);
                 let prevChar;
                 try{
                    prevChar = curr.charAt(i - strNtr.length - 1);
@@ -171,7 +187,7 @@ class ExpressionBuilder extends Console{
                 }
             }
         }
-        throw "expression invalid";
+        return curr;
     }
 
     renderConsole(){

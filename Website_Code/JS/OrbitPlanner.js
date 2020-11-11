@@ -2,9 +2,6 @@
 class OrbitPlanner{
 	static IDS_GENERIC = new Map([["expBuild", "red"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["gameOfLife", "darkviolet"]]);
 	static BLOOP_REFRESH_INTERVAL = 80;
-	static BLOOP_DURATION = 2.5;
-	static BLOOP_SIZE = 7;
-	static BLOOP_COLOR = "lime";
 	static ORBITER_WIDTH = 150;
 	static ORBITER_HEIGHT = 150;
 	static EVACUATE_TIME = 0.6;
@@ -79,7 +76,7 @@ class OrbitPlanner{
 		// fancy divide by 2 (bitshift):
 		let left = (rect.left + rect.right) >> 1;
 		let top = (rect.top + rect.bottom) >> 1;
-		let b = new Bloop(left, top, OrbitPlanner.BLOOP_SIZE, OrbitPlanner.BLOOP_DURATION, this.canvas, OrbitPlanner.BLOOP_COLOR);
+		let b = new Bloop(left, top, this.canvas);
 		b.init();
 	}
 
@@ -204,15 +201,16 @@ class OrbitPlanner{
 
 class Bloop{
 
-	constructor(x, y, size, duration, canvas, rgb, orbiter){
+	static DURATION = 2.5;
+	static SIZE = 7;
+	static COLOR = "lime";
+
+	constructor(x, y, canvas){
 		this.x = x;
 		this.y = y;
-		this.size = size;
-		this.duration = duration;
 		this.age = 1;
 		this.ctx = canvas.getContext("2d");
 		this.canvasColor = window.getComputedStyle(canvas).getPropertyValue("background-color")
-		this.rgb = rgb;
 		this.keepDrawing = true;
 		this.secsElapsed = 0;
 		this.prevTime;
@@ -230,7 +228,7 @@ class Bloop{
 		}
 
 		this.ctx.beginPath();
-		this.ctx.fillStyle = this.canvasColor
+		this.ctx.fillStyle = this.canvasColor;
 		this.ctx.arc(this.x, this.y, size + 1, 0, Math.PI * 2, true);
 		this.ctx.fill();
 
@@ -243,7 +241,7 @@ class Bloop{
 		}
 
 		this.ctx.beginPath();	
-		this.ctx.fillStyle = this.rgb
+		this.ctx.fillStyle = Bloop.COLOR;
 		this.ctx.arc(this.x, this.y, this.getSize(this.secsElapsed), 0, Math.PI * 2);
 		this.ctx.fill();
 
@@ -257,9 +255,9 @@ class Bloop{
 
 	getSize(secsElapsed){
 		secsElapsed += 0.01;
-		let a = (this.size * secsElapsed * 2 / this.duration);
+		let a = (Bloop.SIZE * secsElapsed * 2 / Bloop.DURATION);
 		a = isNaN(a) ? 0 : a;
-		let ans = (-1 * Math.abs(a - this.size)) + this.size;
+		let ans = (-1 * Math.abs(a - Bloop.SIZE)) + Bloop.SIZE;
 		return ans;
 	}
 }
