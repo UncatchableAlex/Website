@@ -13,7 +13,7 @@ class OrbitPlanner{
 	static SPEED_MULTIPLIER = 6;
 
 	constructor(ids = OrbitPlanner.IDS_GENERIC, concurrentAllowed = false, consoleCreator = new ConsoleCreator(this), mouseTranslator = new MouseTranslator(), 
-				styleSheet = null, canvas = document.querySelector("#background")){
+				styleSheet = document.styleSheets[0], canvas = document.querySelector("#background"), orbiterSection = document.getElementById("bodies")){
 		this.concurrentAllowed = concurrentAllowed;
 		this.bloopNum;
 		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_MULTIPLIER;
@@ -21,19 +21,15 @@ class OrbitPlanner{
 		this.intervals = new Map();
 		this.orbiting = new Set();
 		this.canvas = canvas;
-
-		try{
-			this.styleSheet = styleSheet == null ? document.styleSheets[0] : styleSheet;
-		} catch(error){
-			throw "StyleSheetException: Declare or pass stylesheet first";
-		}
 		this.consoleCreator = consoleCreator;
 		this.ids = ids;
 		this.mouseTranslator = mouseTranslator;
 		this.vecRad = Math.min(OrbitPlanner.VEC_RAD_FLOOR, window.innerWidth / 3);
+		this.orbiterSection = orbiterSection;
+		this.styleSheet = styleSheet;
 	}
 
-	makeOrbiters(keys = Array.from(this.ids.keys()), dpoint = null){
+	makeOrbiters(keys = Array.from(this.ids.keys()), dropInPoint = null){
 		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_MULTIPLIER;
 		this.vecRad = Math.min(OrbitPlanner.VEC_RAD_FLOOR, window.innerWidth / 3);
 		// get the document's stylesheet:
@@ -45,9 +41,9 @@ class OrbitPlanner{
 			}
 			this.orbiting.add(id);
 			try{
-				var dropInPoint = [dpoint[0], dpoint[1]];
+				dropInPoint = [dropInPoint[0], dropInPoint[1]];
 			} catch(error){
-				var dropInPoint = Util.getOffScreenPoint();
+				dropInPoint = Util.getOffScreenPoint();
 			}
 			let h = window.innerHeight, w = window.innerWidth;
 			// make new rule for the specific id and add it to the stylesheet:
@@ -55,14 +51,13 @@ class OrbitPlanner{
 			this.styleSheet.insertRule(this.makeRule(id, dropInPoint));
 			// make a new div element:
 			let orbiter = document.createElement("div");
-			// set its class to the stylesheet that was just created:
+			// set its class to the new rule in the stylesheet:
 			orbiter.setAttribute("class", id);
 			orbiter.setAttribute("id", id);
 			let self = this;
 			let md = function(e){self.mouseTranslator.receiveMouseDown(e, self);}
-			orbiter.removeEventListener("mousedown", md);
 			orbiter.addEventListener("mousedown", md);
-			document.getElementById("bodies").appendChild(orbiter);
+			this.orbiterSection.appendChild(orbiter);
 			clearInterval(this.intervals.get(id));
 			let makeBloop = this.makeBloop.bind(this);
 			this.intervals.set(id, setInterval(makeBloop, OrbitPlanner.BLOOP_REFRESH_INTERVAL, orbiter));

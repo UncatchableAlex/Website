@@ -55,7 +55,7 @@ class ExpressionBuilder extends Console{
         try{
             var answerDisplay = document.getElementById("answerDisplay");
         } catch(error){
-            throw "Console must be rendered before expressionBuilder can be run";
+            throw "Console must be rendered before ExpressionBuilder can be run";
         }
         if(message != null){
             newDiv.innerHTML = message;

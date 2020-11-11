@@ -429,7 +429,8 @@ class GameOfLife extends Console{
 			  	"This demonstration is based off of John Conway's " + super.italicize("Game of Life") + " but with a colorful twist. To the left there is a board" +
 			  	" consisting of many \"dead\" cells in a large grid. The rules are simple: <br><br> 1.) Every turn, a dead cell will become alive if three of its eight neighbors are alive " +
 			  	"<br>2.) Every turn, a live cell will die if more than three or fewer than two of its neighbors are alive. <br><br> To start, please select a tile from along the top bar of the left canvas " +
-			  	" (its border will become dark when selected) and click on the canvas to place it. Click \"GO!\" to start the simulation and use the slider to control the speed. Good luck!";
+			  	" (its border will become dark when selected) and click on the canvas to place it. Click \"GO!\" to start the simulation and use the slider to control the speed. The colors mean nothing, they are purely decorative." +
+			  	" Good luck!";
 	  	desc.style.height = "80%";
 	  	desc.style.top = "12%";
 	  	desc.style.width = "90%";

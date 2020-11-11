@@ -153,7 +153,7 @@
 				left: -2.1vw;
 				height: 4vh;
 				width: 4vh;
-				font-size: 100%;
+				font-size: 2vh;
 				z-index: 3000000;
 				user-select: all;
 				cursor: pointer;
@@ -161,7 +161,6 @@
 				user-select: none;
 			}
 			.receptacle{
-				position: absolute;
 				z-index: 300;
 				height: 150px;
 				width: 150px;
