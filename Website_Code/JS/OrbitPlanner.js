@@ -66,12 +66,10 @@ class OrbitPlanner{
 
 
 	makeBloop(orbiter){
-		let rect = orbiter.getBoundingClientRect();
-
-		// fancy divide by 2 (bitshift):
-		let left = (rect.left + rect.right) >> 1;
-		let top = (rect.top + rect.bottom) >> 1;
-		let b = new Bloop(left, top, this.canvas);
+		const rect = orbiter.getBoundingClientRect();
+		const x = (rect.left + rect.right) >> 1;
+		const y = (rect.top + rect.bottom) >> 1;	
+		let b = new Bloop(x, y, this.canvas);
 		b.init();
 	}
 

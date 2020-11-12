@@ -49,8 +49,13 @@ class MouseTranslator{
 							let vec = [secondPoint[0] - firstPoint[0], secondPoint[1] - firstPoint[1]];
 							// the angle of the orbiter when the user clicked on it:
 							this.origAngle = Math.atan(vec[1]/vec[0]);
-							// adjust the angle if it is more than 45 degrees. There is no reason why we should have to rotate more than 45 degs:
-							this.origAngle = this.origAngle > (Math.PI / 4) ? (-1 * Math.PI / 2) + this.origAngle : this.origAngle;
+							// adjust the angle if it is more than 45 degrees or less than -45 degrees. 
+							// There is no reason why we should have to rotate more than abs(45) degs:
+							if(this.origAngle > (Math.PI / 4)){
+								this.origAngle -= (Math.PI / 2);
+							} else if(this.origAngle < (-1 * Math.PI / 4)){
+								this.origAngle += (Math.PI / 2);
+							}
 							// set the orbiter's new style to match where it was when the user picked it up:
 							this.orbiter.style.top = e.clientY - this.offsetTop;
 							this.orbiter.style.left = e.clientX - this.offsetLeft;
