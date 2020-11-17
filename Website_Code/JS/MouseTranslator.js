@@ -89,7 +89,8 @@ class MouseTranslator{
 
 		// use a simple proportion to adjust its rotation so that when it is 0 distance from center, it has 0 rotation:
 		let distToCenter = Util.getDist(this.center, newPos);
-		let newAngle = (this.origAngle / this.origDist) * distToCenter;
+		let newAngle = this.origDist == 0 ? this.origAngle : (this.origAngle / this.origDist) * distToCenter;
+		console.log(newAngle);
 		this.orbiter.style.transform = "rotate(" + newAngle + "rad)";
 	} 
 
