@@ -110,7 +110,7 @@ class OrbitPlanner{
 		rule += (" C " + ctrlPoint1[0] + " " + ctrlPoint1[1] + " " + ctrlPoint2[0] + " " + ctrlPoint2[1] + " " + endPoint[0] + " " + endPoint[1]);
 		// append to complete a pretty pretty pretty animation rule:
 		rule += "'); offset-distance: 0%; animation: orbit; animation: orbit " + (iterations * this.secsPerSegment) + "s linear infinite; animation-fill-mode: forwards;}";
-		console.log(rule);
+		//console.log(rule);
 		return rule;
 	}
 
@@ -192,6 +192,7 @@ class OrbitPlanner{
 	}
 }
 
+// a bloop animation is a small circle that grows and shrinks in the wake of an orbiter
 class Bloop{
 
 	static DURATION = 2.5;
@@ -220,6 +221,7 @@ class Bloop{
 			return;
 		}
 
+		// draw a canvasColored circle to cover up the old bloop frame:
 		this.ctx.beginPath();
 		this.ctx.fillStyle = this.canvasColor;
 		this.ctx.arc(this.x, this.y, size + 1, 0, Math.PI * 2, true);
@@ -233,6 +235,7 @@ class Bloop{
 			return;
 		}
 
+		// draw a new bloop frame in place of the old one:
 		this.ctx.beginPath();	
 		this.ctx.fillStyle = Bloop.COLOR;
 		this.ctx.arc(this.x, this.y, this.getSize(this.secsElapsed), 0, Math.PI * 2);
@@ -246,6 +249,7 @@ class Bloop{
 		this.keepDrawing = false;
 	}
 
+	// get how big the bloop should be after x seconds of animation:
 	getSize(secsElapsed){
 		secsElapsed += 0.01;
 		let a = (Bloop.SIZE * secsElapsed * 2 / Bloop.DURATION);

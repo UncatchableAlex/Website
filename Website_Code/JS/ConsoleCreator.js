@@ -20,6 +20,9 @@ class ConsoleCreator{
   }
 
   openConsole(id){
+    if(this.currentConsole != null){
+      return;
+    }
   	switch(id){
   		case("expBuild"): 
   			this.makeExpressionBuilderConsole();
@@ -49,6 +52,7 @@ class ConsoleCreator{
  closeConsole(){
     if(this.currentConsole != null){
   	 this.currentConsole.closePanel();
+     this.currentConsole = null;
     }
     if(this.evacuated){
       this.orbitPlanner.makeOrbiters();
