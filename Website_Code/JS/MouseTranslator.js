@@ -65,6 +65,9 @@ class MouseTranslator{
 							this.orbiter.setAttribute("class", "beingDragged");
 							this.orbiter.style.background = this.orbitPlanner.ids.get(this.orbiter.id);
 							this.orbiter.style.transform = "rotate(" + this.origAngle + "rad)";
+
+							// find how far it is from the center of the screen:
+							this.origDist = Util.getDist(this.center, [secondRect.left - inc, secondRect.top - inc]);
 					
 							// adjust style to include rotation:
 							this.receiveMouseMove(e, this);
@@ -77,8 +80,6 @@ class MouseTranslator{
 					);	
 				}
 			); 
-		// find how far it is from the center of the screen:
-		this.origDist = Util.getDist(this.center, [e.clientX - this.offsetLeft, e.clientY - this.offsetTop]);
 	}
 
 	// adjust the orbiter's style if it has been selected with a mousedown event and an additional mousemove event has been detected:
@@ -90,7 +91,6 @@ class MouseTranslator{
 		// use a simple proportion to adjust its rotation so that when it is 0 distance from center, it has 0 rotation:
 		let distToCenter = Util.getDist(this.center, newPos);
 		let newAngle = this.origDist == 0 ? this.origAngle : (this.origAngle / this.origDist) * distToCenter;
-		console.log(newAngle);
 		this.orbiter.style.transform = "rotate(" + newAngle + "rad)";
 	} 
 
