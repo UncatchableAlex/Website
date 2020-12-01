@@ -15,14 +15,18 @@
 		<!-- load JavaScript: -->
 		<script src = Website_Code/JS/Util.js></script>
 		<script src = Website_Code/JS/OrbitPlanner.js></script>
+		<script src = Website_Code/JS/Orbiter.js></script>
+		<script src = Website_Code/JS/Bloop.js></script>
 		<script src = Website_Code/JS/MouseTranslator.js></script>
 		<script src = Website_Code/JS/ConsoleCreator.js></script>
 		<script src = Website_Code/JS/Credits.js></script>
 		<script src = Website_Code/JS/About.js></script>
 		<script src = Website_Code/JS/ExpressionBuilder.js></script>
+		<script src = Website_Code/JS/ExpressionBuilderWorker.js></script>
 		<script src = Website_Code/JS/Pathfinder.js></script>
 		<script src = Website_Code/JS/Queue.js></script>
 		<script src = Website_Code/JS/GameOfLife.js></script>
+		<script src = Website_Code/JS/Main.js></script>
 
 
 		<!-- Global site tag (gtag.js) - Google Analytics -->
@@ -35,56 +39,12 @@
 		  gtag('config', 'UA-180653985-1');
 		</script>
 		<!--End Google cite tag-->
-
-
-		<!-- "main method": -->
-		<script>
-			"use strict";
-			var orbitPlanner;
-			var mouseTranslator;
-			var windowResize = -1;
-			var delayOnResize = 500;
-			function onloadSeq(){
-				let bg = document.getElementById("background");
-				bg.width = window.innerWidth;
-				bg.height = window.innerHeight;
-				localStorage.clear();
-				orbitPlanner = new OrbitPlanner();
-				orbitPlanner.makeOrbiters();
-				document.getElementById("background").addEventListener("click", () => {
-						try{
-							orbitPlanner.consoleCreator.closeConsole();
-						} catch(noPanelOpen){
-							//ignore
-						}
-					}
-				);
-				window.addEventListener("resize", windowResizeDone);
-			}
-
-			// if the user resizes the window, repath all of the blocks. The repathing will go into effect after 
-			//delayOnResize milliseconds of no additional resize adjustments:
-			function windowResizeDone(){
-				let bg = document.getElementById("background");
-				bg.width = window.innerWidth;
-				bg.height = window.innerHeight;
-				if(orbitPlanner.consoleCreator.evacuated == true){
-					return;
-				}
-				clearTimeout(windowResize);
-				orbitPlanner.evacuateAll();
-				setTimeout( () => {
-					orbitPlanner.makeOrbiters();
-				}, orbitPlanner.bloopDuration * 1.5);
-			}
-		</script>
 	</head>
+	<!-- NOTE: onloadSeq() lives in Main.js-->
 	<body onload = "onloadSeq();">
 			<canvas id="background" class="background"></canvas>
 			<h1>Alex's Demos</h1>
-			<section id="bodies">
-				<section id="bloops"></section>
-			</section>
+			<section id="bodies"></section>
 			<div id="receptacle" class="receptacle"> Drag Block Here</div>
 	</body>
 </html>

@@ -10,7 +10,7 @@ function Queue(){
 	this.length = 0;
 }
 
-Queue.prototype.push = function(data){
+Queue.prototype.offer = function(data){
 	var newNode = new QueueNode(data);
 	if(this.tail != null){
 		this.tail.next = newNode;

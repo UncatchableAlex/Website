@@ -21,10 +21,6 @@ class About extends Console{
 			" up solving the problem by dropping the animation entirely, changing the element's style, and waiting for the next repaint before " +
 			"assigning it a new class.<br><br>" +
 
-			"Additionally, because multithreading is unsupported in Javascript, the blocks can't be animated while the computer is" +
-			" working on something else (ex: Expression Builder). I dodged this problem by making the blocks evacuate the screen until" + 
-			" the demonstration is complete.<br><br>" +
-
 			"The block animation, as a whole, was possibly the largest challenge. To avoid using the repaint strategy, each " +
 			"block follows a predefined path instead of generating its route in real-time. Essentially, the paths repeat at " +
 			"scheduled intervals, with the repeat point happening off-screen. Some smoke and mirrors worked nicely here.<br><br>" +

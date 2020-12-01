@@ -55,7 +55,7 @@ class ConsoleCreator{
      this.currentConsole = null;
     }
     if(this.evacuated){
-      this.orbitPlanner.makeOrbiters();
+      this.orbitPlanner.animateOrbiters();
       this.evacuated = false;
     }
   }

@@ -121,7 +121,7 @@ class Util{
 
 	// evaluate all off-screen corners and return the furthest one from the defined point:
 	static getFurthestOffScreenPoint(currPoint){
-		const midPoint = [window.innerWidth / 2, window.innerHeight / 2];
+		const midPoint = [window.innerWidth >> 1, window.innerHeight >> 1];
 		if((currPoint[0] < midPoint[0]) && (currPoint[1] < midPoint[1])){
 			return [window.innerWidth + 200, window.innerHeight + 200];
 		} 

@@ -196,7 +196,7 @@ class Pathfinder extends Console{
 		const queue = new Queue();
 
 		// start by adding the first node (the source) for evaluation:
-		queue.push(currNode);
+		queue.offer(currNode);
 
 		while(!queue.isEmpty()){
 			//for every node surrounding the node being evauated:
@@ -211,7 +211,7 @@ class Pathfinder extends Console{
 					// if the current node's neighbor isn't the node itself and the neighbor isn't a maze wall, add it to the queue with 
 					// its parent as the node being evaluated.
 					if((i != currNode.y || j != currNode.x) && (arr[i][j] == Pathfinder.MAZE_OPEN || arr[i][j] == Pathfinder.MAZE_PATH)){
-						queue.push(new Node(j, i, currNode));
+						queue.offer(new Node(j, i, currNode));
 						arr[i][j] = Pathfinder.MAZE_FILLED;
 					}
 				}

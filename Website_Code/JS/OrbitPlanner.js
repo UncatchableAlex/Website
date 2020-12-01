@@ -1,82 +1,49 @@
 "use strict";
 class OrbitPlanner{
-	static IDS_GENERIC = new Map([["expBuild", "red"], ["credits","aqua"], ["about", "gold"], ["amaze","deeppink"], ["gameOfLife", "darkviolet"]]);
 	static BLOOP_REFRESH_INTERVAL = 80;
-	static ORBITER_WIDTH = 150;
-	static ORBITER_HEIGHT = 150;
 	static EVACUATE_TIME = 0.6;
 	static CURVINESS = [300, 500]; 
 	static CURVE_FACTOR = [0.50, 0.75];
 	static SEGMENTS = [30, 50];
 	static ALEX_SCREEN_WIDTH = 1707;
 	static VEC_RAD_FLOOR = 500;
-	static SPEED_MULTIPLIER = 6;
+	static SPEED_COEFFICIENT = 6;
 
-	constructor(ids = OrbitPlanner.IDS_GENERIC, concurrentAllowed = false, consoleCreator = new ConsoleCreator(this), mouseTranslator = new MouseTranslator(), 
-				styleSheet = document.styleSheets[0], canvas = document.querySelector("#background"), orbiterSection = document.getElementById("bodies")){
-		this.concurrentAllowed = concurrentAllowed;
-		this.bloopNum;
-		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_MULTIPLIER;
-		this.rules;
-		this.intervals = new Map();
-		this.orbiting = new Set();
+	constructor(canvas, orbiterSection, styleSheet = document.styleSheets[0]){
+		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_COEFFICIENT;
 		this.canvas = canvas;
-		this.consoleCreator = consoleCreator;
-		this.ids = ids;
-		this.mouseTranslator = mouseTranslator;
 		this.vecRad = Math.min(OrbitPlanner.VEC_RAD_FLOOR, window.innerWidth / 3);
 		this.orbiterSection = orbiterSection;
 		this.styleSheet = styleSheet;
+		this.mouseTranslator = new MouseTranslator(this);
+		this.orbiting = new Map();
+	}
+	setDefaultOrbiters(orbiters){
+		this.orbiters = orbiters
 	}
 
-	makeOrbiters(keys = Array.from(this.ids.keys()), dropInPoint = null){
-		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_MULTIPLIER;
+	animateOrbiters(orbiters = this.orbiters, dropInPoint = null){
+		this.secsPerSegment = (window.innerWidth / OrbitPlanner.ALEX_SCREEN_WIDTH) * OrbitPlanner.SPEED_COEFFICIENT;
 		this.vecRad = Math.min(OrbitPlanner.VEC_RAD_FLOOR, window.innerWidth / 3);
-		// get the document's stylesheet:
-		// for each id:
-		let self = this;
-		for(let id of keys){
-			if(!this.concurrentAllowed && this.orbiting.has(id)){
-				continue;
-			}
-			this.orbiting.add(id);
-			try{
-				dropInPoint = [dropInPoint[0], dropInPoint[1]];
-			} catch(error){
-				dropInPoint = Util.getOffScreenPoint();
-			}
-			let h = window.innerHeight, w = window.innerWidth;
-			// make new rule for the specific id and add it to the stylesheet:
-			Util.deleteCssRule(this.styleSheet, "." + id);
-			this.styleSheet.insertRule(this.makeRule(id, dropInPoint));
-			// make a new div element:
-			let orbiter = document.createElement("div");
-			// set its class to the new rule in the stylesheet:
-			orbiter.setAttribute("class", id);
-			orbiter.setAttribute("id", id);
-			let self = this;
-			let md = function(e){self.mouseTranslator.receiveMouseDown(e, self);}
-			orbiter.addEventListener("mousedown", md);
-			this.orbiterSection.appendChild(orbiter);
-			clearInterval(this.intervals.get(id));
-			let makeBloop = this.makeBloop.bind(this);
-			this.intervals.set(id, setInterval(makeBloop, OrbitPlanner.BLOOP_REFRESH_INTERVAL, orbiter));
+		var self = this;
+		var h = window.innerHeight, w = window.innerWidth;
+		try{
+			dropInPoint = [dropInPoint[0], dropInPoint[1]];
+		} catch(error){
+			dropInPoint = Util.getOffScreenPoint();
 		}
+		orbiters.forEach(orbiter => {
+				if(!Array.from(this.orbiting.keys()).includes(orbiter.id)){
+					this.orbiting.set(orbiter.id, orbiter);
+					orbiter.startAnimation(this.addAnimation(orbiter, dropInPoint));
+				}
+			}
+		);
 	}
 
-
-	makeBloop(orbiter){
-		const rect = orbiter.getBoundingClientRect();
-		const x = (rect.left + rect.right) >> 1;
-		const y = (rect.top + rect.bottom) >> 1;	
-		let b = new Bloop(x, y, this.canvas);
-		b.init();
-	}
-
-	makeRule(id, dropInPoint){
-		if(!this.ids.has(id)){
-			throw "No corresponding ids found in the id map";
-		}
+	addAnimation(orbiter, dropInPoint){
+		//delete the old rule:
+		Util.deleteCssRule(this.styleSheet, "." + orbiter.id);
 		// make a point to end at (don't be confused as to the name. It will make sense later):
 		let startPoint = Util.getRandomPoint(dropInPoint, this.vecRad);
 		// make a random first control point:
@@ -86,10 +53,10 @@ class OrbitPlanner{
 		// these guys will be used later. Keep them null for now though:
 		let ctrlPoint2, ctrlPoint1, endPoint;
 		// start making a new rule:
-		let rule = "." + id + "{cursor: pointer; background: " + this.ids.get(id) + "; position: absolute; border-radius: 0%; height: " + OrbitPlanner.ORBITER_HEIGHT + "px; width: " + 
-					OrbitPlanner.ORBITER_WIDTH + "px;" + " top:0px; left: 0px; z-index: 20; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
+		let rule = "." + orbiter.id + "{cursor: pointer; background: " + orbiter.color + "; position: absolute; border-radius: 0%; height: " + Orbiter.WIDTH + "px; width: " + 
+					Orbiter.WIDTH + "px;" + " top:0px; left: 0px; z-index: 20; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 					firstCtrl[1] + " " + prevCtrl[0] + " " + prevCtrl[1] + " " + startPoint[0] + " " + startPoint[1];
-		// make between 7 and 15 svg bezier curve paths:
+		// get an acceptable number of bezier curve paths:
 		const iterations = Util.getRandomIntInRange(OrbitPlanner.SEGMENTS[0], OrbitPlanner.SEGMENTS[1]);
 		for(let i = 0; i < iterations; i++){
 			// get a control point that is colinear with the startpoint and the last control point:
@@ -110,9 +77,41 @@ class OrbitPlanner{
 		rule += (" C " + ctrlPoint1[0] + " " + ctrlPoint1[1] + " " + ctrlPoint2[0] + " " + ctrlPoint2[1] + " " + endPoint[0] + " " + endPoint[1]);
 		// append to complete a pretty pretty pretty animation rule:
 		rule += "'); offset-distance: 0%; animation: orbit; animation: orbit " + (iterations * this.secsPerSegment) + "s linear infinite; animation-fill-mode: forwards;}";
-		//console.log(rule);
-		return rule;
+		// insert new rule to stylesheet:
+		this.styleSheet.insertRule(rule);
+		return orbiter.id;
 	}
+
+	remove(orbiter){
+		this.orbiting.delete(orbiter.id);
+	}
+		
+	// evacuate all orbiters from the screen:
+	evacuateAll(){
+		let self = this;
+		for(let orbiter of this.orbiting.values()){
+			try{
+				let rect = orbiter.getRect();
+				this.evacuate(orbiter, [rect.left, rect.top]);
+			} catch(error){
+				continue;
+			}
+		}
+	}
+
+		// make block with given ID run very far, very quickly.
+	evacuate(orbiter, dropInPoint){
+		orbiter.vanish();
+		this.orbiting.delete(orbiter.id);
+		let runner = document.createElement("div")
+		runner.id = "runner";
+		runner.style = this.getRunStyle(dropInPoint, orbiter.color);
+		//setTimeout(() => {runner.style.animationPlayState = "paused"}, 100);
+		setTimeout(() => {runner.remove();}, OrbitPlanner.EVACUATE_TIME * 1000);
+		this.orbiterSection.appendChild(runner);
+	}
+
+
 
 	getFirstCtrlPoint(prevCtrl, startPoint){
 		// make a unit vector pointing from the control point of the previous curve to the start point of this curve.
@@ -151,110 +150,15 @@ class OrbitPlanner{
 		return secondCtrl;
 	}
 
-		
-	// evacuate all orbiters from the screen:
-	evacuateAll(){
-		let self = this;
-		for(let id of this.ids.keys()){
-			try{
-				var orbiter = document.getElementById(id);
-				let rect = orbiter.getBoundingClientRect();
-				this.evacuate(orbiter, [rect.left, rect.top]);
-			} catch(error){
-				continue;
-			}
-		}
-	}
-
-	// make block with given ID run very far, very quickly.
-	evacuate(orbiter, dropInPoint){
-		this.orbiting.delete(orbiter.id);
-		orbiter.remove();
-		let runner = document.createElement("div")
-		runner.id = "runner";
-		runner.style = this.getRunStyle(dropInPoint, this.ids.get(orbiter.id));
-		setInterval(() => {runner.remove();}, OrbitPlanner.EVACUATE_TIME * 1000);
-
-		clearInterval(this.intervals.get(orbiter.id));
-		document.body.appendChild(runner);
-	}
-
 	// make a style string that will make the orbiter fly off screen
 	getRunStyle(dropInPoint, color){
 		let endPoint = Util.getFurthestOffScreenPoint(dropInPoint);
 		let firstCtrl = this.getFirstCtrlPoint(Util.getRandomPoint(dropInPoint, this.vecRad), dropInPoint);
 		let secondCtrl = this.getSecondCtrlPoint(dropInPoint, firstCtrl, endPoint);
-		let cmd = "background: " + color + "; position: absolute; border-radius: 0%; height: " + OrbitPlanner.ORBITER_HEIGHT + "px; width: " + OrbitPlanner.ORBITER_WIDTH + "px;" +
+		let cmd = "background: " + color + "; position: absolute; border-radius: 0%; height: " + Orbiter.WIDTH + "px; width: " + Orbiter.WIDTH + "px;" +
 					"top:0px; left: 0px; z-index: 1; offset-path: path('M " + dropInPoint[0] + " " + dropInPoint[1] + " C " + firstCtrl[0] + " " +
 					firstCtrl[1] + " " + secondCtrl[0] + " " + secondCtrl[1] + " " + endPoint[0] + " " + endPoint[1] + 
 					"'); offset-distance: 0%; animation: orbit " + OrbitPlanner.EVACUATE_TIME + "s linear; animation-fill-mode: forwards;";
 		return cmd;
-	}
-}
-
-// a bloop animation is a small circle that grows and shrinks in the wake of an orbiter
-class Bloop{
-
-	static DURATION = 2.5;
-	static SIZE = 7;
-	static COLOR = "lime";
-
-	constructor(x, y, canvas){
-		this.x = x;
-		this.y = y;
-		this.age = 1;
-		this.ctx = canvas.getContext("2d");
-		this.canvasColor = window.getComputedStyle(canvas).getPropertyValue("background-color")
-		this.keepDrawing = true;
-		this.secsElapsed = 0;
-		this.prevTime;
-	}
-
-	init(){
-		let drawBloop = this.drawBloop.bind(this);
-		requestAnimationFrame(drawBloop);
-	}
-
-	drawBloop(currentTime){
-		let size = this.getSize(this.secsElapsed);
-		if(!this.keepDrawing || size <= 0){
-			return;
-		}
-
-		// draw a canvasColored circle to cover up the old bloop frame:
-		this.ctx.beginPath();
-		this.ctx.fillStyle = this.canvasColor;
-		this.ctx.arc(this.x, this.y, size + 1, 0, Math.PI * 2, true);
-		this.ctx.fill();
-
-		this.secsElapsed += (this.prevTime == null ? 0 : ((currentTime - this.prevTime) / 1000));
-		this.prevTime = currentTime;
-		size = this.getSize(this.secsElapsed);
-
-		if(size <= 0){
-			return;
-		}
-
-		// draw a new bloop frame in place of the old one:
-		this.ctx.beginPath();	
-		this.ctx.fillStyle = Bloop.COLOR;
-		this.ctx.arc(this.x, this.y, this.getSize(this.secsElapsed), 0, Math.PI * 2);
-		this.ctx.fill();
-
-		let drawBloop = this.drawBloop.bind(this);
-		requestAnimationFrame(drawBloop);
-	}
-
-	stopDrawing(){
-		this.keepDrawing = false;
-	}
-
-	// get how big the bloop should be after x seconds of animation:
-	getSize(secsElapsed){
-		secsElapsed += 0.01;
-		let a = (Bloop.SIZE * secsElapsed * 2 / Bloop.DURATION);
-		a = isNaN(a) ? 0 : a;
-		let ans = (-1 * Math.abs(a - Bloop.SIZE)) + Bloop.SIZE;
-		return ans;
 	}
 }
