@@ -1,9 +1,10 @@
-			html{
+			html {
 				margin: 0px;
 				min-height: 100%;
 				width: 100%;
 			}
-			body{
+
+			body {
 				position: absolute;
 				background-color: black;
 				top: 0px;
@@ -13,12 +14,14 @@
 				margin: 0px;
 				overflow: hidden;
 			}
-			h1,h2{
+
+			h1,h2 {
 				font-family: "blippo, fantasy";
 				color: lightslategrey;
 				user-select: none;
 			}
-			h1{
+
+			h1 {
 				position: relative;
 				top: 10%;
 				text-align: center;
@@ -26,7 +29,8 @@
 				font-weight: bold;
 				font-style: italic;
 			}
-			h2{
+
+			h2 {
 				position: relative;
 				top: 5%;
 				height: 10%;
@@ -36,7 +40,26 @@
 				margin-bottom: 0px;
 				font-size: 2vw;
 			}
-			input{
+
+			h3 {
+				margin-top: 0px;
+				position: relative;
+				color: coral;
+				text-align: center;
+				font-size: 3vw;
+			}
+
+			h3:hover {
+				font-size: 3.5vw;
+				transform: translateY(-0.25vw);
+			}
+
+			h3, #bloopToggler {
+				user-select: none;
+				cursor: pointer;
+			}
+
+			input {
 				position: absolute;
 				background: transparent;
 				border: 0;
@@ -46,7 +69,8 @@
 				position: absolute;
 				text-align: center;
 			}
-			p{
+
+			p {
 				position: absolute;
 				padding: 5%;
 				margin: auto;
@@ -54,7 +78,8 @@
 				overflow: auto;
 				user-select: none;
 			}
-			button{
+
+			button {
 				position: absolute;
 				margin: auto;
 				border: none;
@@ -66,22 +91,26 @@
 				user-select: none;
 				cursor: pointer;
 			}
-			img{
+
+			img {
 				border-color: lightgrey;
 			}
-			canvas, img, .textContainer{
+
+			canvas, img, .textContainer {
 				position: absolute;
 				border-width: .4vh;
 				border-style: solid;
 				background: white;
 			}
-			canvas, .textContainer{
+
+			canvas, .textContainer {
 				border-color: lightslategrey;
 				top: 0%;
 				width: 70%;
 				height: 100%;
 			}
-			#background{
+
+			#background {
 				position: absolute;
 				top: 0%;
 				left: 0%;
@@ -91,13 +120,30 @@
 				border-width: 0px;
 				z-index: 0;
 			}
-			.border{
+
+			#bloopToggler {
+				bottom: 5%;
+				right: 5%;
+				height: 5vw;
+				width: 5vw;
+				border-style: solid;
+				border-width: 2%;
+				border-color: lightslategrey;
+				color: lightslategrey;
+				font-size: 1.35vw;
+				font-style: italic;
+				text-align: center;
+				z-index: 1000000;
+			}
+
+			.border {
 				position: absolute;
 				background: lightskyblue;
 				width: 30%;
 				min-height: 20%;
 			}
-			.blackBar{
+
+			.blackBar {
 				position: absolute;
 				background: black;
 				height: 5%;
@@ -105,7 +151,8 @@
 				bottom: 5%;
 				left: 10%;
 			}
-			.console{
+
+			.console {
 				position: absolute;
 				top: 35%;
 				left: 30%;
@@ -118,19 +165,20 @@
 		 		flex-wrap: wrap;
 		 		align-content: flex-start;
 			}
-			.beingDragged{
+
+			.beingDragged {
 				position: absolute;
 				z-index: 400;
-				height: 150px;
-				width: 150px;
+				height: 165px;
+				width: 165px;
 			}
-			.runner{
+			.runner {
 				position: absolute;
 				z-index: 100;
 				height: 150px;
 				width: 150px;
 			}
-			.answerDisplay{
+			.answerDisplay {
 				font-size: 1.4vw;
 				text-align: center;
 				position: absolute;
@@ -140,7 +188,8 @@
 				height: 10%;
 				width: 90%;
 			}
-			.xout, .receptacle{
+
+			.xout, .receptacle, #bloopToggler {
 				position: absolute;
 				background: transparent;
 				font-family: Times New Roman, Times, serif;
@@ -148,7 +197,7 @@
 				text-align: center;
 
 			}
-			.xout{
+			.xout {
 				top: -4.5vh;
 				left: -2.1vw;
 				height: 4vh;
@@ -160,14 +209,15 @@
 				color: dimgrey;
 				user-select: none;
 			}
-			.receptacle{
+
+			.receptacle {
 				z-index: 300;
-				height: 150px;
-				width: 150px;
-				top: 50%;
+				height: 165px;
+				width: 165px;
+				top: 60%;
 				left: 50%;
 				border-color: grey;
-				transform: translate(-75px, -75px);
+				transform: translate(-82.5px, -82.5px);
 				color: lightslategrey;			
 				border-style: solid;
 				line-height: 50px;
@@ -175,7 +225,8 @@
 				font-style: italic;
 				user-select: none;
 			}	
-			@keyframes orbit{
-				from{offset-distance: 0%;}
-				to{offset-distance: 100%;}
+
+			@keyframes orbit {
+				from {offset-distance: 0%;}
+				to {offset-distance: 100%;}
 			}

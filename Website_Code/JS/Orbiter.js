@@ -1,7 +1,9 @@
 class Orbiter{
 	static WIDTH = 150;
 	static BLOOP_INTERVAL = 80;
-	constructor(id, color, section, eventListeners, canvas, useBoundingRect){
+
+	// useBoundingRect should ALWAYS be set to true. It is an experiemental feature that I never got around to fixing. 
+	constructor(id, color, section, eventListeners, canvas, bloopToggler, useBoundingRect){
 		this.id = id;
 		this.color = color;
 		this.section = section;
@@ -17,6 +19,7 @@ class Orbiter{
 		this.hidden = false;
 		this.pauseTime = null;
 		this.useBoundingRect = useBoundingRect;
+		this.bloopToggler = bloopToggler;
 	}
 
 	startAnimation(rule){
@@ -71,6 +74,9 @@ class Orbiter{
 	}
 
 	makeBloop(){
+		if (bloopToggler.getAttribute("toggled") == "false") {
+			return;
+		}
 		if(document.visibilityState == "hidden"){
 			this.hidden = true;
 			this.pause();

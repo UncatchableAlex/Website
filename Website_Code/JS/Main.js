@@ -1,6 +1,7 @@
 "use strict";
 var orbitPlanner;
 var mouseTranslator;
+var bloopToggler;
 var consoleCreator;
 var windowResize = -1;
 var delayOnResize = 500;
@@ -12,13 +13,16 @@ function onloadSeq(){
 	mouseTranslator = new MouseTranslator(orbitPlanner, consoleCreator);
 	let md = mouseTranslator.receiveMouseDown.bind(mouseTranslator);
 	let el = [["mousedown", md]];
+	bloopToggler = document.querySelector("#bloopToggler");
+	bloopToggler.addEventListener("click", toggleBloops);
+	toggleBloops();
 	let orbiters = new Set(
 		[
-			new Orbiter("expBuild", "red", bodies, el, bg, true), 
-			new Orbiter("credits", "aqua", bodies, el, bg, true), 
-			new Orbiter("about", "gold", bodies, el, bg, true), 
-			new Orbiter("amaze", "deeppink", bodies, el, bg, true), 
-			new Orbiter("gameOfLife", "darkviolet", bodies, el, bg, true)
+			new Orbiter("expBuild", "red", bodies, el, bg, bloopToggler, true), 
+			new Orbiter("credits", "aqua", bodies, el, bg, bloopToggler, true), 
+			new Orbiter("about", "gold", bodies, el, bg, bloopToggler, true), 
+			new Orbiter("amaze", "deeppink", bodies, el, bg, bloopToggler, true), 
+			new Orbiter("gameOfLife", "darkviolet", bodies, el, bg, bloopToggler, true)
 		]
 	);
 	orbitPlanner.setDefaultOrbiters(orbiters);
@@ -26,9 +30,9 @@ function onloadSeq(){
 	bg.height = window.innerHeight;
 	orbitPlanner.animateOrbiters();
 	bg.addEventListener("click", () => {
-			try{
+			try {
 				orbitPlanner.consoleCreator.closeConsole();
-			} catch(noPanelOpen){
+			} catch (noPanelOpen) {
 				//ignore
 			}
 		}
@@ -36,10 +40,23 @@ function onloadSeq(){
 	window.addEventListener("resize", windowResizeDone);
 }
 
+function toggleBloops() {
+	let isX = document.querySelector("h3");
+	if (isX == null) {
+		let bigX = document.createElement("h3");
+		bigX.innerHTML = "X";
+		bloopToggler.appendChild(bigX);
+		bloopToggler.setAttribute("toggled", "true");
+	} else {
+		isX.remove();
+		bloopToggler.setAttribute("toggled", "false");
+	}
+}
+
 // if the user resizes the window, repath all of the blocks. The repathing will go into effect after 
 //delayOnResize milliseconds of no additional resize adjustments:
 function windowResizeDone(){
-	if(consoleCreator.evacuated == true){
+	if(consoleCreator.evacuated == true) {
 		return;
 	}
 	let can = document.getElementById("background");

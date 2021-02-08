@@ -4,7 +4,7 @@
 	The Pathfinder class allows for the creation of a Pathfinder console where a user can draw a maze for the computer to execute a breadth-first
 	search on. 
 */
-class Pathfinder extends Console{
+class Pathfinder extends Console {
 
 	// define static field variables:
 	static USER_RGBA = [0,0,0,255]; // black
@@ -24,7 +24,7 @@ class Pathfinder extends Console{
 	static BORDER_COLOR = "#FFC6C6";
 
 
-	constructor(consoleCreator, canvasId, width, height){
+	constructor(consoleCreator, canvasId, width, height) {
 		super(consoleCreator);
 
 		// for storing the coordinates of the user's previous update:
@@ -63,7 +63,7 @@ class Pathfinder extends Console{
 	}
 
 	// make the canvas element that will be drawn on:
-	makeCanvas(id, width, height){
+	makeCanvas(id, width, height) {
 		let canvas = document.createElement("canvas");
 		canvas.id = id;
 		canvas.style.left = "0%";
@@ -73,16 +73,16 @@ class Pathfinder extends Console{
 		// give the canvas event listeners so that the user can modify it
 		canvas.addEventListener("mousedown", (e) => {self.mousedown = true;});
 		canvas.addEventListener("mouseup", (e) => {self.mousedown = false; self.drawShortestPath();});
-		canvas.addEventListener("mousemove", (e) => {if(self.mousedown) self.updateCanvas(e);});
+		canvas.addEventListener("mousemove", (e) => {if (self.mousedown) self.updateCanvas(e);});
 		return canvas;
 	}
 
 	// make an array of zeros with the height and width of the given this.canvas:
-	makeBlankArr(can){
+	makeBlankArr(can) {
 		let blankArr = new Array();
-		for(let i = 0; i < can.height; i++){
+		for (let i = 0; i < can.height; i++) {
 			let myCol = new Array();
-			for(let j = 0; j < can.width; j++){
+			for (let j = 0; j < can.width; j++) {
 				myCol.push(Pathfinder.MAZE_OPEN);
 			}
 			blankArr.push(myCol);
@@ -91,11 +91,11 @@ class Pathfinder extends Console{
 	}
 
 	// return a deep copy of the given array:
-	copyArray(arr){
+	copyArray(arr) {
 		let copy = new Array();
-		for(let i = 0; i < arr.length; i++){
+		for (let i = 0; i < arr.length; i++) {
 			let row = new Array();
-			for(let j = 0; j < arr[0].length; j++){
+			for (let j = 0; j < arr[0].length; j++) {
 				row.push(arr[i][j]);
 			}
 			copy.push(row);
@@ -104,13 +104,13 @@ class Pathfinder extends Console{
 	}
 
 	//draw a series of dots along the shortest path calculated:
-	drawShortestPath(){
+	drawShortestPath() {
 		// get the current image data:
 		let imgDat = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
 		// get the final node in the path:
 		let currNode = this.getPath(this.canvasBin);
 		// draw a dot for each node along the found path:
-		while(currNode != null){
+		while(currNode != null) {
 			this.drawDot(imgDat, [currNode.x, currNode.y], Pathfinder.PATH_RGBA, this.pathThickness, "path");
 			currNode = currNode.parent;
 		}
@@ -120,7 +120,7 @@ class Pathfinder extends Console{
 	}
 
 	// update the this.canvas with user input:
-	updateCanvas(e){
+	updateCanvas(e) {
 		// convert the given coordinates from the event, to usable this.canvas coordinates:
 		const rect = this.canvas.getBoundingClientRect();
 
@@ -134,7 +134,7 @@ class Pathfinder extends Console{
 		vec = Util.normalizeVector(vec);
 		let distGone = 0;
 		this.drawDot(this.pathlessData, can, Pathfinder.USER_RGBA, this.userThickness, "user");
-		while(distGone + (0.2 * this.userThickness) <= dist){		
+		while(distGone + (0.2 * this.userThickness) <= dist) {		
 			distGone += (0.2 * this.userThickness);
 			this.drawDot(this.pathlessData, [can[0] + (distGone * vec[0]) << 0, can[1] + (distGone * vec[1]) << 0], Pathfinder.USER_RGBA, this.userThickness, "user");
 		}
@@ -142,28 +142,28 @@ class Pathfinder extends Console{
 		this.ctx.putImageData(this.pathlessData, 0, 0);
 	}
 
-	drawDot(imgDat, canvasCoors, rgba, radius, type = "user"){
-		if(type == "user" && (Util.getDist(canvasCoors, [this.leftBoundX, this.upperBoundY]) < Pathfinder.SAFESPACE || Util.getDist(canvasCoors, [this.rightBoundX, this.lowerBoundY]) < Pathfinder.SAFESPACE)){
+	drawDot(imgDat, canvasCoors, rgba, radius, type = "user") {
+		if (type == "user" && (Util.getDist(canvasCoors, [this.leftBoundX, this.upperBoundY]) < Pathfinder.SAFESPACE || Util.getDist(canvasCoors, [this.rightBoundX, this.lowerBoundY]) < Pathfinder.SAFESPACE)) {
 			return;
 		}
 		// for each x coordinate in the radius
-		for(let i = -1 * radius; i < radius; i++){
+		for (let i = -1 * radius; i < radius; i++) {
 				// find the height of the circle at that x and loop for each pixel along that column:
 				let upper = Math.sqrt(Math.pow(radius, 2) - Math.pow(i, 2));
 				upper = Math.round(upper) << 0;
 				const lower = -1 * upper;
-				for(let j = lower; j <= upper; j++){
+				for (let j = lower; j <= upper; j++) {
 					//if the coordinates are too close to the source or sink, just skip it:
-					if((canvasCoors[0] + i <= 0) || (canvasCoors[1] + j <= 0) || (canvasCoors[0] + i >= this.canvas.width) || (canvasCoors[1] + j >= this.canvas.height)){
+					if ((canvasCoors[0] + i <= 0) || (canvasCoors[1] + j <= 0) || (canvasCoors[0] + i >= this.canvas.width) || (canvasCoors[1] + j >= this.canvas.height)) {
 						continue;
 					}
 					// if the user is doing the drawing, update the canvasBin according to whether or not erase-mode is in effect:
-					if(type == "user"){
+					if (type == "user") {
 						this.canvasBin[canvasCoors[1] + j][canvasCoors[0] + i] = this.eraseToggle ? Pathfinder.MAZE_OPEN : Pathfinder.MAZE_WALL;
 					}
 					// modify the relevent pixels in imageData.data
 					const pix = 4 * (((canvasCoors[1] + j) * this.canvas.width) + canvasCoors[0] + i)
-					for(var k = 0; k < 4; k++){
+					for (var k = 0; k < 4; k++) {
 						imgDat.data[pix + k] = (this.eraseToggle && type == "user") ? Pathfinder.ERASE_RGBA[k] : rgba[k];
 					}
 				}
@@ -171,9 +171,9 @@ class Pathfinder extends Console{
 	}
 
 	// return an array of the nodes used in the maze solution (mainly for debuggers and inquisitive minds):
-	getPathArr(node){
+	getPathArr(node) {
 		let arr = [];
-		while(node != null){
+		while(node != null) {
 			arr.push([node.x, node.y]);
 			node = node.parent;
 		}
@@ -181,7 +181,7 @@ class Pathfinder extends Console{
 	}
 
 	// find the path from the source to the sink useing a depth-first search:
-	getPath(binArr){
+	getPath(binArr) {
 
 		// copy the array because we are going to flood/destroy it while finding a solution:
 		let arr = this.copyArray(binArr);
@@ -198,19 +198,19 @@ class Pathfinder extends Console{
 		// start by adding the first node (the source) for evaluation:
 		queue.offer(currNode);
 
-		while(!queue.isEmpty()){
+		while(!queue.isEmpty()) {
 			//for every node surrounding the node being evauated:
-			for(let i = Math.max(currNode.y - 1, this.upperBoundY); i <= Math.min(currNode.y + 1, this.lowerBoundY); i++){
-				for(let j = Math.max(currNode.x - 1, this.leftBoundX); j <= Math.min(currNode.x + 1, this.rightBoundX); j++){
+			for (let i = Math.max(currNode.y - 1, this.upperBoundY); i <= Math.min(currNode.y + 1, this.lowerBoundY); i++) {
+				for (let j = Math.max(currNode.x - 1, this.leftBoundX); j <= Math.min(currNode.x + 1, this.rightBoundX); j++) {
 					// if the node being evaluated is the target node:
-					if(i == targetNode.y && j == targetNode.x){
+					if (i == targetNode.y && j == targetNode.x) {
 						// set its parent to the previous node and return:
 						targetNode.parent = currNode;
 						return targetNode;
 					}
 					// if the current node's neighbor isn't the node itself and the neighbor isn't a maze wall, add it to the queue with 
 					// its parent as the node being evaluated.
-					if((i != currNode.y || j != currNode.x) && (arr[i][j] == Pathfinder.MAZE_OPEN || arr[i][j] == Pathfinder.MAZE_PATH)){
+					if ((i != currNode.y || j != currNode.x) && (arr[i][j] == Pathfinder.MAZE_OPEN || arr[i][j] == Pathfinder.MAZE_PATH)) {
 						queue.offer(new Node(j, i, currNode));
 						arr[i][j] = Pathfinder.MAZE_FILLED;
 					}
@@ -224,7 +224,7 @@ class Pathfinder extends Console{
 	}
 
 	// reset the this.canvas:
-	resetCanvas(){
+	resetCanvas() {
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		this.pathlessData = this.ctx.getImageData(0, 0, this.canvas.width, this.canvas.height);
 		this.canvasBin = this.makeBlankArr(this.canvas);
@@ -232,10 +232,10 @@ class Pathfinder extends Console{
 
 	
 	// print an array (debuggers and curious coders only):
-	printArr(arr){
+	printArr(arr) {
 		let str = "";
-		for(let i = 0; i < arr.length; i++){
-			for(let j = 0; j < arr[0].length; j++){
+		for (let i = 0; i < arr.length; i++) {
+			for (let j = 0; j < arr[0].length; j++) {
 				str += arr[i][j];
 			}
 			str += "\n";
@@ -244,7 +244,7 @@ class Pathfinder extends Console{
 	}
 
 	// make a console for the pathfinder game:
-	renderConsole(){
+	renderConsole() {
 
 		// store a reference to this Pathfinder instance so that it can be referenced from different scopes:
 		let self = this;
@@ -273,7 +273,7 @@ class Pathfinder extends Console{
 		[leftBar, rightBar, topBar, bottomBar].forEach(bar => {
 			bar.addEventListener("mousedown", (e) => {self.mousedown = true;});
 			bar.addEventListener("mouseup", (e) => {self.mousedown = false; self.drawShortestPath();});
-			bar.addEventListener("mousemove", (e) => {if(self.mousedown) self.updateCanvas(e);});
+			bar.addEventListener("mousemove", (e) => {if (self.mousedown) self.updateCanvas(e);});
 			canvasContainer.appendChild(bar);
 		}
 		);
@@ -296,7 +296,7 @@ class Pathfinder extends Console{
 		resetButton.id = "resetButton";
 		resetButton.style = "left: 4%; bottom: 5%; height: 5%; width: 3%; z-index: 2000000; font-size: 2vh"
 		resetButton.innerHTML = "R";
-		resetButton.onclick = function(){self.resetCanvas();}
+		resetButton.onclick = function() {self.resetCanvas();}
 		pf.appendChild(resetButton);
 
 		var eraseButton = document.createElement("button");
@@ -304,7 +304,7 @@ class Pathfinder extends Console{
 		var ebBaseStyle = "left: 8%; bottom: 5%; height: 5%; width: 3%; z-index: 2000000; font-size: 2vh;";
 		eraseButton.style = ebBaseStyle;
 		eraseButton.innerHTML = "E";
-		eraseButton.onclick = function(){
+		eraseButton.onclick = function() {
 			self.eraseToggle = !self.eraseToggle;
 			eraseButton.style = ebBaseStyle + (self.eraseToggle ? " background-color: azure;" : "");
 		}
@@ -334,7 +334,7 @@ class Pathfinder extends Console{
 	}
 }
 
-function Node(x, y, parent = null){
+function Node(x, y, parent = null) {
 	this.x = x;
 	this.y = y;
 	this.parent = parent;

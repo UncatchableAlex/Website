@@ -23,8 +23,10 @@ class MouseTranslator{
 			throw "unrecognized target for receiveMouseDown()";
 		}
 
-		// the center of the screen:
-		this.center = [(window.innerWidth - Orbiter.WIDTH) / 2, (window.innerHeight - Orbiter.WIDTH) / 2];
+		// the center of the receptacle:
+		let recep = document.querySelector("#receptacle");
+		let recepRect = recep.getBoundingClientRect();
+		this.center = [recepRect.left, recepRect.top];
 
 		// get the bounding rectangle of the orbiter as it is now:
 		var firstRect = this.orbiter.getRect();
@@ -65,7 +67,7 @@ class MouseTranslator{
 							// move the orbiter to where it was when the user picked it up:
 							this.orbiter.moveTo([secondRect.left - inc, secondRect.top - inc]);
 
-							// find how far it is from the center of the screen:
+							// find how far it is from the center of the receptacle:
 							this.origDist = Util.getDist(this.center, [secondRect.left - inc, secondRect.top - inc]);
 					
 							// adjust style to include rotation:
