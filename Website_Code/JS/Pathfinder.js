@@ -312,16 +312,16 @@ class Pathfinder extends Console {
 
 
 		let desc = document.createElement("p")
-		desc.innerHTML = "Instructions: Drag your mouse over the left-side this.canvas to construct the walls of your maze. The computer will attempt to find a " +
+		desc.innerHTML = "Instructions: Drag your mouse over the left-side canvas to construct the walls of your maze. The computer will attempt to find a " +
 				" passage from the top left to the bottom right. If it is unable, it will give up and the game is over. Use the button marked \"R\" to reset and \"E\" to toggle the eraser. " + 
 				"Please make an epic maze to do this demo justice. <br><br>" + 
 				"Description: Perhaps by now you have seen the \"depth-first\" exhibit and the stunning precision that it can achieve. Often overlooked, however,"+
 				" is its sister searching algorithm: the \"breadth-first\" search. Neither algorithm is better in all cases, and a lot of the time, deciding "+
 				"between them can be a challenge. If depth-first searching is like lightning, always looking for an expansion node furthest away from its source, " +
 				"then breadth-first searching is more like an oil spill, stretching outward in all directions evenly until finding its target. In this case, the " +
-				"medium that is being flooded is a two dimensional plane with the size and resolution of the this.canvas displayed on-screen (the origin of the spill being the top left). The first edge of the " +
+				"medium that is being flooded is a two dimensional plane with the size and resolution of the canvas displayed on-screen (the origin of the spill being the top left). The first edge of the " +
 				"metaphorical spilled oil that touches the target destination (bottom right) will be traced back to its source and marked in red. This algorithm goes much faster than the " +
-				"depth-first search because there are only MxN nodes to evaluate (the number of pixels on the this.canvas) as opposed to the billions of permutations that the depth-first search must account for."
+				"depth-first search because there are only MxN nodes to evaluate (the number of pixels on the canvas) as opposed to the billions of permutations that the depth-first search must account for."
 		desc.style = "padding: 1% 1% 1% 1%";
 		desc.style.width = "90%";
 		desc.style.left = "5%"
